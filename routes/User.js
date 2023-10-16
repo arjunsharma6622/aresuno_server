@@ -22,7 +22,7 @@ router.post('/register', async (req, res) => {
     }
 })
 
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res, next) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
@@ -40,6 +40,7 @@ router.post('/login', async (req, res) => {
             maxAge: 24 * 60 * 60 * 1000, // 1 day
         });
         res.status(200).json({ message: "User logged in successfully", success: true });
+        next()
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
