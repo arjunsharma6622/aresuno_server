@@ -63,9 +63,9 @@ router.get('/', async (req, res) => {
 });
 
 // READ ONE
-router.get('/:id',vendorVerification, async (req, res) => {
+router.get('/',vendorVerification, async (req, res, next) => {
     try {
-        const vendor = await Vendor.findById(req.params.id);
+        const vendor = await Vendor.findById(req.vendor._id);
         if (!vendor) {
             return res.status(404).send();
         }
@@ -76,7 +76,7 @@ router.get('/:id',vendorVerification, async (req, res) => {
 });
 
 // UPDATE
-router.patch('/:id', vendorVerification, async (req, res) => {
+router.patch('/', vendorVerification, async (req, res, next) => {
     const updates = Object.keys(req.body);
     const allowedUpdates = ['name', 'password'];
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
@@ -86,7 +86,7 @@ router.patch('/:id', vendorVerification, async (req, res) => {
     }
 
     try {
-        const vendor = await Vendor.findById(req.params.id);
+        const vendor = await Vendor.findById(req.vendor._id);
         if (!vendor) {
             return res.status(404).send();
         }
@@ -111,9 +111,9 @@ router.patch('/:id', vendorVerification, async (req, res) => {
 });
 
 //DELETE
-router.delete('/:id', vendorVerification, async (req, res) => {
+router.delete('/', vendorVerification, async (req, res, next) => {
     try {
-        const vendor = await Vendor.findByIdAndDelete(req.params.id);
+        const vendor = await Vendor.findByIdAndDelete(req.vendor._id);
         if (!vendor) {
             return res.status(404).send({ error: "Vendor not found" });
         }
