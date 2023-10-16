@@ -36,7 +36,7 @@ router.post('/login', async (req, res, next) => {
         const token = createSecretToken(user._id);
         console.log(token);
         res.cookie("token", token, {
-            httpOnly: true,
+            httpOnly: false,
             maxAge: 24 * 60 * 60 * 1000, // 1 day
         });
         res.status(200).json({ message: "User logged in successfully", success: true });
