@@ -19,7 +19,7 @@ router.post('/register', async (req, res) => {
     } catch (error) {
         res.status(400).send(error);
     }
-});
+})
 
 router.post('/login', async (req, res) => {
     try {
