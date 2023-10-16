@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const { createSecretToken } = require('../utils/SecretToken');
+const { userVerification } = require('../middlewares/authorization');
 
 // CREATE
 router.post('/register', async (req, res) => {
@@ -56,7 +57,7 @@ router.get('/', async (req, res) => {
 });
 
 // READ ONE
-router.get('/:id', async (req, res) => {
+router.get('/:id', userVerification, async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (!user) {
@@ -69,7 +70,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // UPDATE
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', userVerification, async (req, res) => {
     const updates = Object.keys(req.body);
     const allowedUpdates = ['name', 'place', 'password'];
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
@@ -105,7 +106,7 @@ router.patch('/:id', async (req, res) => {
 
 
 //DELETE
-router.delete('/:id', async (req, res) => {
+router.delete('/:id',userVerification, async (req, res) => {
     try {
         const user = await User.findByIdAndDelete(req.params.id);
         if (!user) {
