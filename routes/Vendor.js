@@ -53,7 +53,7 @@ router.post('/login', async (req, res) => {
 });
 
 // READ ALL
-router.get('/', async (req, res) => {
+router.get('/all-vendors', async (req, res) => {
     try {
         const vendors = await Vendor.find();
         res.send(vendors);
