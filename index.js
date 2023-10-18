@@ -49,8 +49,10 @@ app.post('/api/login', async (req, res, next) => {
         const { email, password } = req.body;
 
         let user = await User.findOne({ email });
+        let userType = "user"
         if (!user) {
             user = await Vendor.findOne({ email });
+            userType = "vendor"
         }
 
         if (!user) {
@@ -76,7 +78,7 @@ app.post('/api/login', async (req, res, next) => {
             message = 'Vendor logged in successfully';
         }
 
-        res.status(200).json({ message : message, success: true });
+        res.status(200).json({ message : message, success: true, userType: userType });
         next();
     } catch (error) {
         console.error(error);
