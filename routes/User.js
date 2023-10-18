@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const { createSecretToken } = require('../utils/SecretToken');
-const { userVerification } = require('../middlewares/authorization');
+const { verification } = require('../middlewares/authorization');
 
 // CREATE
 router.post('/register', async (req, res) => {
@@ -22,32 +22,32 @@ router.post('/register', async (req, res) => {
     }
 })
 
-router.post('/login', async (req, res, next) => {
-    try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: 'Incorrect email or password' });
-        }
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(400).json({ message: 'Incorrect email or password' });
-        }
-        const token = createSecretToken(user._id);
-        console.log(token);
-        res.cookie("token", token, {
-            httpOnly: false,
-            maxAge: 24 * 60 * 60 * 1000, // 1 day
-            sameSite: 'none',
-            secure: true
-        });
-        res.status(200).json({ message: "User logged in successfully", success: true });
-        next()
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-});
+// router.post('/login', async (req, res, next) => {
+//     try {
+//         const { email, password } = req.body;
+//         const user = await User.findOne({ email });
+//         if (!user) {
+//             return res.status(400).json({ message: 'Incorrect email or password' });
+//         }
+//         const isPasswordValid = await bcrypt.compare(password, user.password);
+//         if (!isPasswordValid) {
+//             return res.status(400).json({ message: 'Incorrect email or password' });
+//         }
+//         const token = createSecretToken(user._id);
+//         console.log(token);
+//         res.cookie("token", token, {
+//             httpOnly: false,
+//             maxAge: 24 * 60 * 60 * 1000, // 1 day
+//             sameSite: 'none',
+//             secure: true
+//         });
+//         res.status(200).json({ message: "User logged in successfully", success: true });
+//         next()
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Internal server error' });
+//     }
+// });
 
 // READ ALL
 router.get('/all-users', async (req, res) => {
@@ -60,7 +60,7 @@ router.get('/all-users', async (req, res) => {
 });
 
 // READ ONE
-router.get('/', userVerification, async (req, res, next) => {
+router.get('/', verification, async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id);
         if (!user) {
@@ -73,7 +73,7 @@ router.get('/', userVerification, async (req, res, next) => {
 });
 
 // UPDATE
-router.patch('/', userVerification, async (req, res, next) => {
+router.patch('/', verification, async (req, res, next) => {
     const updates = Object.keys(req.body);
     const allowedUpdates = ['name', 'place', 'password'];
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
@@ -109,7 +109,7 @@ router.patch('/', userVerification, async (req, res, next) => {
 
 
 //DELETE
-router.delete('/',userVerification, async (req, res, next) => {
+router.delete('/',verification, async (req, res, next) => {
     try {
         const user = await User.findByIdAndDelete(req.user._id);
         if (!user) {
