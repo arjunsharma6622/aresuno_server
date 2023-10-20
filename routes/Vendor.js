@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const { createSecretToken } = require('../utils/SecretToken');
 const { vendorVerification, verification } = require('../middlewares/authorization');
 const User = require('../models/User');
+const Business = require('../models/Business');
 
 
 // CREATE
@@ -75,6 +76,16 @@ router.get('/all-vendors', async (req, res) => {
         res.status(500).send(error);
     }
 });
+
+
+router.get("/businesses", verification, async (req, res, next) => {
+    try {
+        const businesses = await Business.find({ vendorId: req.user._id });
+        res.status(201).send(businesses);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+})
 
 // READ ONE
 router.get('/',verification, async (req, res, next) => {
