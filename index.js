@@ -23,7 +23,7 @@ app.use(cors({
 
 }))
 app.use(cookieParser());
-
+app.options('*', cors());
 // ss
 
 // Connect to MongoDB database
