@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const BusinessSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: "Enter ame"
+        required: true,
     },
     type: {
         type: String,
@@ -12,93 +12,71 @@ const BusinessSchema = new mongoose.Schema({
     },
     profileImg: {
         type: String,
-        // required: true
     },
     vendorId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Vendor',
-        // required: true
+        required: true
     },
+    description: String,
+    website: String,
+    email: String,
     mainCategory: {
         type: String,
-        // required: true
+        required: true
     },
     subCategory: {
         type: String,
-        // required: true
+        required: true
     },
     address: {
         place: {
             type: String,
-            // required: true
         },
         pincode: {
             type: String,
-            // required: true
         },
-        latitude: {
-            type: Number,
-            // required: true
-        },
-        longitude: {
-            type: Number,
-            // required: true
+        coordinates: {
+            type: [Number], // [longitude, latitude]
+            index: '2dsphere'
         }
     },
     phone: {
         type: String,
-        // required: true
+        required: true
     },
     timing: {
         type: String,
-        // required: true
     },
     posts: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Post'
     }],
-    photosGallery: [{
-        type: String
-    }],
-    modeOfPayment: [{
-        type: String,
-        // required: true
-    },],
+    photosGallery: [String],
+    modeOfPayment: [String],
     ratingsReviews: [{
         rating: {
             type: Number,
-            // required: true
         },
         review: {
             type: String,
-            // required: true
         }
     }],
     socialLinks: {
-        facebook: {
-            type: String
-        },
-        twitter: {
-            type: String
-        },
-        instagram: {
-            type: String
-        }
+        facebook: String,
+        twitter: String,
+        instagram: String
     },
     faqs: [{
         question: {
             type: String,
-            // required: true
         },
         answer: {
             type: String,
-            // required: true
         }
     }]
+}, {
+    timestamps: true // adds createdAt and updatedAt fields
 });
 
 module.exports = mongoose.model('Business', BusinessSchema);
-
-
-
-
