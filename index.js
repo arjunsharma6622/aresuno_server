@@ -89,7 +89,7 @@ app.post('/api/login', async (req, res, next) => {
 });
 
 
-app.get('/api/logout', (req, res) => {
+app.post('/api/logout', (req, res) => {
     res.clearCookie('token', { path: '/' }).send('Cookie cleared');
   });
   
