@@ -67,10 +67,10 @@ app.post('/api/login', async (req, res, next) => {
         const token = createSecretToken(user._id);
         console.log(token);
         res.cookie('token', token, {
-            httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000, // 1 day
             sameSite: 'none',
-            secure: true
+            secure: true,
+            domain: "aresuno.vercel.app"
         });
 
         let message;
