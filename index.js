@@ -80,7 +80,7 @@ app.post('/api/login', async (req, res, next) => {
             message = 'Vendor logged in successfully';
         }
 
-        res.status(200).json({ message : message, success: true, userType: userType });
+        res.status(200).json({ message : message, success: true, userType: userType, user: user });
         next();
     } catch (error) {
         console.error(error);
