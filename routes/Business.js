@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Business = require('../models/Business');
+const Vendor = require('../models/Vendor');
 
 // CREATE
 router.post('/register', async (req, res) => {
@@ -8,6 +9,8 @@ router.post('/register', async (req, res) => {
         const newBusiness = new Business(req.body);
         console.log(newBusiness);
         await newBusiness.save();
+        const vendorId = newBusiness.vendorId;
+        await Vendor.updateOne({ _id: vendorId }, { $push: { businesses: newBusiness._id } });
         res.status(201).send(newBusiness);
     } catch (error) {
         console.log(error);
