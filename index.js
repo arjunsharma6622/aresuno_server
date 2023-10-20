@@ -88,6 +88,12 @@ app.post('/api/login', async (req, res, next) => {
     }
 });
 
+
+app.get('/api/logout', (req, res) => {
+    res.clearCookie('token').send('Cookie cleared');
+  });
+  
+
 // Import routes
 app.use('/api/business', require('./routes/Business'));
 app.use('/api/user', require('./routes/User'));
