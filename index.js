@@ -17,7 +17,7 @@ app.use(express.json());
 
 
 app.use(cors({
-    origin: ['https://aresuno.vercel.app'],
+    origin: ['https://aresuno.vercel.app', 'http://localhost:5173'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Added OPTIONS method
     allowedHeaders: ['Content-Type', 'Authorization'], // Adjust with your required headers
@@ -70,7 +70,6 @@ app.post('/api/login', async (req, res, next) => {
             maxAge: 24 * 60 * 60 * 1000, // 1 day
             sameSite: 'none',
             secure: true,
-            domain: "aresuno-server.vercel.app" // Update the domain to the backend server's domain
         });
         
 
@@ -90,20 +89,7 @@ app.post('/api/login', async (req, res, next) => {
 });
 
 app.use('/api/logout', (req, res) => {
-    res.clearCookie('token', {
-        httpOnly: true,
-        sameSite: 'none',
-        secure: true,
-        domain: "aresuno-server.vercel.app" // Update the domain to the backend server's domain
-    });
-    
-
-    // Set the CORS headers
-    res.header('Access-Control-Allow-Origin', 'https://aresuno.vercel.app');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.header('Access-Control-Allow-Credentials', true);
-
+    res.clearCookie('token');
     res.status(200).end();
 });
 
