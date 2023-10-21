@@ -20,12 +20,13 @@ router.post('/register', async (req, res) => {
 
         const token = createSecretToken(user._id);
         console.log(token);
+         
         res.cookie('token', token, {
-            httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000, // 1 day
             sameSite: 'none',
             secure: true,            
         });
+        
 
         res.status(201).send(user);
     } catch (error) {

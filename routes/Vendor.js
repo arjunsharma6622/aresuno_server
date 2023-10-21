@@ -26,7 +26,6 @@ router.post('/register', async (req, res) => {
         const token = createSecretToken(vendor._id);
         console.log(token);
         res.cookie('token', token, {
-            httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000, // 1 day
             sameSite: 'none',
             secure: true,            
@@ -38,31 +37,6 @@ router.post('/register', async (req, res) => {
         res.status(400).send(error);
     }
 });
-
-
-// router.post('/login', async (req, res) => {
-//     try {
-//         const { email, password } = req.body;
-//         const vendor = await Vendor.findOne({ email });
-//         if (!vendor) {
-//             return res.status(400).json({ message: 'Incorrect email or password' });
-//         }
-//         const isPasswordValid = await bcrypt.compare(password, vendor.password);
-//         if (!isPasswordValid) {
-//             return res.status(400).json({ message: 'Incorrect email or password' });
-//         }
-//         const token = createSecretToken(vendor._id);
-//         console.log(token);
-//         res.cookie("token", token, {
-//             httpOnly: true,
-//             maxAge: 24 * 60 * 60 * 1000, // 1 day
-//         });
-//         res.status(200).json({ message: "Vendor logged in successfully", success: true });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ message: 'Internal server error' });
-//     }
-// });
 
 
 
