@@ -19,9 +19,9 @@ app.use(express.json());
 app.use(cors({
     origin: ['https://aresuno.vercel.app'],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-
-}))
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Added OPTIONS method
+    allowedHeaders: ['Content-Type', 'Authorization'], // Adjust with your required headers
+}));
 app.use(cookieParser());
 // ss
 
@@ -80,7 +80,7 @@ app.post('/api/login', async (req, res, next) => {
             message = 'Vendor logged in successfully';
         }
 
-        res.status(200).json({ message : message, success: true, userType: userType, user: user });
+        res.status(200).json({ message: message, success: true, userType: userType, user: user });
         next();
     } catch (error) {
         console.error(error);
@@ -88,16 +88,23 @@ app.post('/api/login', async (req, res, next) => {
     }
 });
 
-
-app.post('/api/logout', (req, res) => {
+app.use('/api/logout', (req, res) => {
     res.clearCookie('token', {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 1 day
         sameSite: 'none',
         secure: true
     });
-  });
-  
+
+    // Set the CORS headers
+    res.header('Access-Control-Allow-Origin', 'https://aresuno.vercel.app');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Credentials', true);
+
+    res.status(200).end();
+});
+
 
 // Import routes
 app.use('/api/business', require('./routes/Business'));
