@@ -28,7 +28,9 @@ router.post('/register', async (req, res) => {
         res.cookie('token', token, {
             maxAge: 24 * 60 * 60 * 1000, // 1 day
             sameSite: 'none',
-            secure: true,            
+            secure: true,  
+            withCredentials: true,
+            httpOnly: false          
         });
 
         res.status(201).send(vendor);

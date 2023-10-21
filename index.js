@@ -68,6 +68,8 @@ app.post('/api/login', async (req, res, next) => {
             maxAge: 24 * 60 * 60 * 1000, // 1 day
             sameSite: 'none',
             secure: true,
+            withCredentials: true,
+            httpOnly: false    
         });
         
 
