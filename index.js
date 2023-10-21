@@ -64,13 +64,14 @@ app.post('/api/login', async (req, res, next) => {
 
         const token = createSecretToken(user._id);
         console.log(token);
-        res.cookie('token', token, {
-            maxAge: 24 * 60 * 60 * 1000, // 1 day
-            sameSite: 'none',
-            secure: true,
-            withCredentials: true,
-            httpOnly: false    
-        });
+        // res.cookie('token', token, {
+        //     maxAge: 24 * 60 * 60 * 1000, // 1 day
+        //     sameSite: 'none',
+        //     secure: true,
+        //     withCredentials: true,
+        //     httpOnly: false    
+        // });
+
         
 
         let message;
@@ -80,7 +81,7 @@ app.post('/api/login', async (req, res, next) => {
             message = 'Vendor logged in successfully';
         }
 
-        res.status(200).json({ message: message, success: true, userType: userType, user: user });
+        res.status(200).json({ message: message, success: true, userType: userType, user: user, token: token });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
