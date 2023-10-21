@@ -50,28 +50,58 @@ const Vendor = require("../models/Vendor");
 
 
 // Middleware for User and Vendor Verification
-module.exports.verification = (req, res, next) => {
-  const token = req.cookies.token;
-  console.log("Token:", token);
-  if (!token) {
-      return res.status(401).json({ message: "Unauthorized" });
-  }
+// module.exports.verification = (req, res, next) => {
+//   const token = req.cookies.token;
+//   console.log("Token:", token);
+//   if (!token) {
+//       return res.status(401).json({ message: "Unauthorized" });
+//   }
 
-  jwt.verify(token, process.env.TOKEN_KEY, async (err, data) => {
-      if (err) {
-          return res.status(401).json({ message: "Unauthorized" });
-      } else {
-          let user;
-          if (req.baseUrl.includes("user")) {
-              user = await User.findById(data.id);
-          } else if (req.baseUrl.includes("vendor")) {
-              user = await Vendor.findById(data.id);
-          }
-          if (!user) {
-              return res.status(404).json({ message: "User/Vendor not found" });
-          }
-          req.user = user; // Set the user object in the request for use in other routes/controllers
-          next();
-      }
-  });
+//   jwt.verify(token, process.env.TOKEN_KEY, async (err, data) => {
+//       if (err) {
+//           return res.status(401).json({ message: "Unauthorized" });
+//       } else {
+//           let user;
+//           if (req.baseUrl.includes("user")) {
+//               user = await User.findById(data.id);
+//           } else if (req.baseUrl.includes("vendor")) {
+//               user = await Vendor.findById(data.id);
+//           }
+//           if (!user) {
+//               return res.status(404).json({ message: "User/Vendor not found" });
+//           }
+//           req.user = user; // Set the user object in the request for use in other routes/controllers
+//           next();
+//       }
+//   });
+// };
+
+
+
+
+
+module.exports.verification = (req, res, next) => {
+    const token = req.headers.authorization.split(' ')[1];
+    console.log("Token:", token);
+    if (!token) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    jwt.verify(token, process.env.TOKEN_KEY, async (err, data) => {
+        if (err) {
+            return res.status(401).json({ message: "Unauthorized" });
+        } else {
+            let user;
+            if (req.baseUrl.includes("user")) {
+                user = await User.findById(data.id);
+            } else if (req.baseUrl.includes("vendor")) {
+                user = await Vendor.findById(data.id);
+            }
+            if (!user) {
+                return res.status(404).json({ message: "User/Vendor not found" });
+            }
+            req.user = user; // Set the user object in the request for use in other routes/controllers
+            next();
+        }
+    });
 };
