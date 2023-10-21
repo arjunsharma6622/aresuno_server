@@ -93,7 +93,8 @@ app.use('/api/logout', (req, res) => {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 1 day
         sameSite: 'none',
-        secure: true
+        secure: true,
+        domain: "aresuno.vercel.app"
     });
 
     // Set the CORS headers
