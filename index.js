@@ -70,8 +70,9 @@ app.post('/api/login', async (req, res, next) => {
             maxAge: 24 * 60 * 60 * 1000, // 1 day
             sameSite: 'none',
             secure: true,
-            domain: "aresuno.vercel.app"
+            domain: "aresuno-server.vercel.app" // Update the domain to the backend server's domain
         });
+        
 
         let message;
         if (user instanceof User) {
@@ -91,11 +92,11 @@ app.post('/api/login', async (req, res, next) => {
 app.use('/api/logout', (req, res) => {
     res.clearCookie('token', {
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000, // 1 day
         sameSite: 'none',
         secure: true,
-        domain: "aresuno.vercel.app"
+        domain: "aresuno-server.vercel.app" // Update the domain to the backend server's domain
     });
+    
 
     // Set the CORS headers
     res.header('Access-Control-Allow-Origin', 'https://aresuno.vercel.app');
