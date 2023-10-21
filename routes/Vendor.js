@@ -33,7 +33,7 @@ router.post('/register', async (req, res) => {
             httpOnly: false          
         });
 
-        res.status(201).send(vendor);
+        res.status(201).send({vendor : vendor, token : token});
     } catch (error) {
         console.log('eerrr')
         res.status(400).send(error);

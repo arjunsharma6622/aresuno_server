@@ -30,7 +30,7 @@ router.post('/register', async (req, res) => {
         });
         
 
-        res.status(201).send(user);
+        res.status(201).send({user : user, token : token});
     } catch (error) {
         res.status(400).send(error);
     }
