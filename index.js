@@ -91,7 +91,12 @@ app.post('/api/login', async (req, res, next) => {
 
 
 app.post('/api/logout', (req, res) => {
-    res.clearCookie('token', { path: '/', domain: ['http://localhost:5173', 'https://aresuno.vercel.app'] }).send('Cookie cleared');
+    res.clearCookie('token', {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        sameSite: 'none',
+        secure: true
+    });
   });
   
 
