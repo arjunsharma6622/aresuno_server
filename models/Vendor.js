@@ -13,7 +13,6 @@ const VendorSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        required: true,
         unique: true,
         index : true
     },
@@ -24,7 +23,6 @@ const VendorSchema = new mongoose.Schema({
     gender: {
         type: String,
         enum: ['male', 'female', 'other'],
-        required: true
     },
     businesses: [{
         type: mongoose.Schema.Types.ObjectId,

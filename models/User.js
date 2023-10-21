@@ -19,7 +19,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         unique: true,
         index : true,
-        required: true
     },
     gender: {
         type: String,
