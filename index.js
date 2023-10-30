@@ -8,6 +8,7 @@ const Vendor = require('./models/Vendor');
 const { createSecretToken } = require('./utils/SecretToken');
 const app = express();
 const bcrypt = require('bcrypt');
+const cloudinary = require('cloudinary').v2;
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ app.listen(port, () => {
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
+
 
 
 // Unified Login Endpoint
@@ -101,6 +103,35 @@ app.use('/api/logout', (req, res) => {
 app.use('/api/business', require('./routes/Business'));
 app.use('/api/user', require('./routes/User'));
 app.use('/api/vendor', require('./routes/Vendor'));
+
+
+
+// Return "https" URLs by setting secure: true
+cloudinary.config({
+    secure: true
+  });
+  
+  // Log the configuration
+  console.log(cloudinary.config());
+
+
+  // Upload image function
+  const uploadImage = async (imgPath) => {
+    const options = {
+        use_filename : true,
+        unique_filename : false,
+        overwrite : true
+    }
+
+    try{
+        // upload image
+        const result = await cloudinary.uploader.upload(imgPath, options);
+        console.log(result)
+        return result.public_id
+    }catch(error){
+        console.log(error)
+    }
+  }
 
 
 

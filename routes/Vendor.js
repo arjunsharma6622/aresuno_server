@@ -93,6 +93,7 @@ router.patch('/', verification, async (req, res, next) => {
         }
 
         if (req.body.password) {
+            console.log(req.body.password)
             const hashedPassword = await bcrypt.hash(req.body.password, 10);
             vendor.password = hashedPassword;
         }
