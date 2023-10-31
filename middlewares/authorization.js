@@ -82,7 +82,7 @@ const Vendor = require("../models/Vendor");
 
 module.exports.verification = (req, res, next) => {
     const token = req.headers.authorization.split(' ')[1];
-    console.log("Token:", token);
+    console.log("Token: in auth middlware", token);
     console.log("req.baseUrl:", req.baseUrl);
     console.log(req.headers.authorization)
     if (!token) {
@@ -94,9 +94,9 @@ module.exports.verification = (req, res, next) => {
             return res.status(401).json({ message: "Unauthorized" });
         } else {
             let user;
-            if (req.baseUrl.includes("user")) {
+            if (req.baseUrl.includes("user") || req.baseUrl.includes("business")) {
                 user = await User.findById(data.id);
-            } else if (req.baseUrl.includes("vendor")) {
+            } else if (req.baseUrl.includes("vendor") || req.baseUrl.includes("business")) {
                 user = await Vendor.findById(data.id);
             }
             if (!user) {
