@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Business = require('../models/Business');
 const Vendor = require('../models/Vendor');
+const { verification } = require('../middlewares/authorization');
 
 // CREATE
 router.post('/register', async (req, res) => {
