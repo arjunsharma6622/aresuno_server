@@ -67,9 +67,11 @@ router.patch('/:id', async (req, res) => {
 });
 
 // DELETE
-router.delete('/:id', verification, async (req, res) => {
+router.delete('/:id', verification, async (req, res, next) => {
     try {
+        console.log('The business id to be deleted is' + req.params.id);
         const business = await Business.findByIdAndDelete(req.params.id);
+        
         if (!business) {
             return res.status(404).send("Business not found");
         }
