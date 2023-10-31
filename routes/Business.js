@@ -66,7 +66,7 @@ router.patch('/:id', async (req, res) => {
 });
 
 // DELETE
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verification, async (req, res) => {
     try {
         const business = await Business.findByIdAndDelete(req.params.id);
         if (!business) {
