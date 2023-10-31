@@ -94,10 +94,12 @@ module.exports.verification = (req, res, next) => {
             return res.status(401).json({ message: "Unauthorized" });
         } else {
             let user;
-            if(!req.baseUrl.includes("business")){
-                if (req.baseUrl.includes("user")) {
+
+            console.log(req.baseUrl)
+
+                if (req.baseUrl.includes("user") || req.baseUrl.includes("business")) {
                     user = await User.findById(data.id);
-                } else if (req.baseUrl.includes("vendor")) {
+                } else if (req.baseUrl.includes("vendor") || req.baseUrl.includes("business")) {
                     user = await Vendor.findById(data.id);
                 }
                 if (!user) {
@@ -105,7 +107,7 @@ module.exports.verification = (req, res, next) => {
                     return res.status(404).json({ message: "User/Vendor not found" });
                 }
                 req.user = user; // Set the user object in the request for use in other routes/controllers
-            }
+            
             next();
         }
     });
