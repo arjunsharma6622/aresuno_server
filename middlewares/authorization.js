@@ -97,11 +97,17 @@ module.exports.verification = (req, res, next) => {
 
             console.log(req.baseUrl)
 
-                if (req.baseUrl.includes("user") || req.baseUrl.includes("business")) {
+            if(req.baseUrl.includes("user") || req.baseUrl.includes("vendor") || req.baseUrl.includes("business")) {
+                
+            
+                if (req.baseUrl.includes("user")) {
                     user = await User.findById(data.id);
-                } else if (req.baseUrl.includes("vendor") || req.baseUrl.includes("business")) {
+                } else if (req.baseUrl.includes("vendor")) {
                     user = await Vendor.findById(data.id);
                 }
+
+
+            }
                 if (!user) {
                     console.log(req.baseUrl)
                     return res.status(404).json({ message: "User/Vendor not found" });
