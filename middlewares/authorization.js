@@ -99,7 +99,8 @@ module.exports.verification = (req, res, next) => {
             } else if (req.baseUrl.includes("vendor") || req.baseUrl.includes("business")) {
                 user = await Vendor.findById(data.id);
             }
-            if (!user) {
+            else if (!user) {
+                console.log(req.baseUrl)
                 return res.status(404).json({ message: "User/Vendor not found" });
             }
             req.user = user; // Set the user object in the request for use in other routes/controllers
