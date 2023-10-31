@@ -92,18 +92,25 @@ module.exports.verification = (req, res, next) => {
     jwt.verify(token, process.env.TOKEN_KEY, async (err, data) => {
         if (err) {
             return res.status(401).json({ message: "Unauthorized" });
-        } else {
-            let user;
+        } else { 
+            let user; 
+            console.log('enterrrreedd maiinn else block')
 
             console.log(req.baseUrl)
 
             if(req.baseUrl.includes("user") || req.baseUrl.includes("vendor") || req.baseUrl.includes("business")) {
+
+                console.log('in the main if block')
                 
             
                 if (req.baseUrl.includes("user")) {
+                    console.log('in the user check if block')
                     user = await User.findById(data.id);
+                    console.log('exit the user check if block')
                 } else if (req.baseUrl.includes("vendor")) {
+                    console.log('in the vendor check if block')
                     user = await Vendor.findById(data.id);
+                    console.log('exit the vendor check if block')
                 }
 
 
