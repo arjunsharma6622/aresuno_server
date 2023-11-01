@@ -73,7 +73,8 @@ router.delete('/:id', verification, async (req, res, next) => {
         console.log('The business id to be deleted is' + req.params.id);
         const business = await Business.findByIdAndDelete(req.params.id);
 
-        const updatedVendor = await Vendor.findOneAndUpdate({ _id : req.user._id }, { $pull: {businesses : new ObjectId(req.params.id)} });
+        await Vendor.findOneAndUpdate({ _id : req.user._id }, { $pull: {businesses : new ObjectId(req.params.id)} });
+        const updatedVendor = await Vendor.findById(req.user._id);
 
         console.log('The updated Venodr is : ' + updatedVendor);
         
