@@ -92,35 +92,38 @@ module.exports.verification = (req, res, next) => {
     jwt.verify(token, process.env.TOKEN_KEY, async (err, data) => {
         if (err) {
             return res.status(401).json({ message: "Unauthorized" });
-        } else { 
-            let user; 
-            console.log('enterrrreedd maiinn else block')
+        } else {
+            let user;
 
             console.log(req.baseUrl)
 
-            if(req.baseUrl.includes("user") || req.baseUrl.includes("vendor") || req.baseUrl.includes("business")) {
+            if (req.baseUrl.includes("business")) {
 
-                console.log('in the main if block')
-                
-            
-                if (req.baseUrl.includes("user")) {
-                    console.log('in the user check if block')
-                    user = await User.findById(data.id);
-                    console.log('exit the user check if block')
-                } else if (req.baseUrl.includes("vendor")) {
-                    console.log('in the vendor check if block')
+                console.log('in the business check if block')
+
+
+                user = await User.findById(data.id);
+                if (!user) {
                     user = await Vendor.findById(data.id);
-                    console.log('exit the vendor check if block')
                 }
-
+                console.log(user)
 
             }
-                if (!user) {
-                    console.log(req.baseUrl)
-                    return res.status(404).json({ message: "User/Vendor not found" });
-                }
-                req.user = user; // Set the user object in the request for use in other routes/controllers
-            
+            else if (req.baseUrl.includes("user")) {
+                console.log('in the user check if block')
+                user = await User.findById(data.id);
+                console.log('exit the user check if block')
+            } else if (req.baseUrl.includes("vendor")) {
+                console.log('in the vendor check if block')
+                user = await Vendor.findById(data.id);
+                console.log('exit the vendor check if block')
+            }
+            if (!user) {
+                console.log(req.baseUrl)
+                return res.status(404).json({ message: "User/Vendor not found" });
+            }
+            req.user = user; // Set the user object in the request for use in other routes/controllers
+
             next();
         }
     });
