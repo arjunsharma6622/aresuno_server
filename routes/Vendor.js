@@ -113,9 +113,9 @@ router.patch('/', verification, async (req, res, next) => {
 });
 
 //DELETE
-router.delete('/', verification, async (req, res, next) => {
+router.delete('/:id', async (req, res, next) => {
     try {
-        const vendor = await Vendor.findByIdAndDelete(req.user._id);
+        const vendor = await Vendor.findByIdAndDelete(req.params.id);
         if (!vendor) {
             return res.status(404).send({ error: "Vendor not found" });
         }
