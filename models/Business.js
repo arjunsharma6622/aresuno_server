@@ -114,15 +114,34 @@ const BusinessSchema = new mongoose.Schema({
 
 
 
+// BusinessSchema.pre('save', async function (next) {
+//     try {
+//         const business = this;
+//         const existingBusiness = await mongoose.model('Business').findOne({ name: business.name });
+
+//         if (existingBusiness) {
+//             const err = new Error('Business with this name already exists');
+//             err.status = 401; // conflict status code
+//             return next(err);
+//         }
+
+//         next();
+//     } catch (error) {
+//         next(error);
+//     }
+// });
+
 BusinessSchema.pre('save', async function (next) {
     try {
         const business = this;
-        const existingBusiness = await mongoose.model('Business').findOne({ name: business.name });
+        if (business.isModified('name')) {
+            const existingBusiness = await mongoose.model('Business').findOne({ name: business.name });
 
-        if (existingBusiness) {
-            const err = new Error('Business with this name already exists');
-            err.status = 409; // conflict status code
-            return next(err);
+            if (existingBusiness) {
+                const err = new Error('Business with this name already exists');
+                err.status = 409; // conflict status code
+                return next(err);
+            }
         }
 
         next();
@@ -130,6 +149,7 @@ BusinessSchema.pre('save', async function (next) {
         next(error);
     }
 });
+
 
 
 

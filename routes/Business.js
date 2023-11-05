@@ -88,7 +88,7 @@ router.patch('/:id/rating', verification, async (req, res, next) => {
 
         res.send(business);
     } catch (error) {
-        res.status(400).send(error);
+        res.status(400).json({message: "error in rating and review", error});
     }
 })
 
