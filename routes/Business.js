@@ -67,7 +67,7 @@ router.patch('/:id', async (req, res) => {
     }
 });
 
-router.patch('/:id/rating', verification, async (req, res) => {
+router.patch('/:id/rating', verification, async (req, res, next) => {
     const { rating, review } = req.body;
     try {
         const business = await Business.findById(req.params.id);
