@@ -67,6 +67,21 @@ router.patch('/:id', async (req, res) => {
     }
 });
 
+router.patch('/:id/rating', verification, async (req, res) => {
+    const { rating, review } = req.body;
+    try {
+        const business = await Business.findById(req.params.id);
+        if (!business) {
+            return res.status(404).send();
+        }
+        business.ratingsReviews.push({ userId : req.user._id, rating, review });
+        await business.save();
+        res.send(business);
+    } catch (error) {
+        res.status(400).send(error);
+    }
+})
+
 // DELETE
 router.delete('/:id', verification, async (req, res, next) => {
     try {

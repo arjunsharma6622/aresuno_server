@@ -79,6 +79,9 @@ const BusinessSchema = new mongoose.Schema({
     photosGallery: [String],
     modeOfPayment: [],
     ratingsReviews: [{
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+        },
         rating: {
             type: Number,
         },
