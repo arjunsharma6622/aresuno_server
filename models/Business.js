@@ -19,6 +19,9 @@ const BusinessSchema = new mongoose.Schema({
         ref: 'Vendor',
         required: true
     },
+    vendorName:{
+        type: String
+    },
     description: {
         type: String,
     },
