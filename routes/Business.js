@@ -69,13 +69,23 @@ router.patch('/:id', async (req, res) => {
 
 router.patch('/:id/rating', verification, async (req, res, next) => {
     const { rating, review } = req.body;
+    const ratingReview = {
+        userId : req.user._id,
+        rating,
+        review
+    }
+
+    console.log(ratingReview)
+
     try {
         const business = await Business.findById(req.params.id);
         if (!business) {
             return res.status(404).send();
         }
-        business.ratingsReviews.push({ userId : req.user._id, rating, review });
+        business.ratingsReviews.push(ratingReview);
         await business.save();
+        console.log("check the push one")
+
         res.send(business);
     } catch (error) {
         res.status(400).send(error);

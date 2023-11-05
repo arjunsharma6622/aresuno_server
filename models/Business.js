@@ -46,7 +46,7 @@ const BusinessSchema = new mongoose.Schema({
             index: '2dsphere'
         }
     },
-    iframe : {
+    iframe: {
         type: String
     },
     phone: {
@@ -78,17 +78,19 @@ const BusinessSchema = new mongoose.Schema({
     }],
     photosGallery: [String],
     modeOfPayment: [],
-    ratingsReviews: [{
-        userId: {
-            type: mongoose.Schema.Types.ObjectId,
-        },
-        rating: {
-            type: Number,
-        },
-        review: {
-            type: String,
+    ratingsReviews: [
+        {
+            userId: {
+                type: mongoose.Schema.Types.ObjectId,
+            },
+            rating: {
+                type: Number,
+            },
+            review: {
+                type: String,
+            }
         }
-    }],
+    ],
     socialLinks: {
         website: String,
         instagram: String,
@@ -114,21 +116,21 @@ const BusinessSchema = new mongoose.Schema({
 
 BusinessSchema.pre('save', async function (next) {
     try {
-      const business = this;
-      const existingBusiness = await mongoose.model('Business').findOne({ name: business.name });
-  
-      if (existingBusiness) {
-        const err = new Error('Business with this name already exists');
-        err.status = 409; // conflict status code
-        return next(err);
-      }
-  
-      next();
+        const business = this;
+        const existingBusiness = await mongoose.model('Business').findOne({ name: business.name });
+
+        if (existingBusiness) {
+            const err = new Error('Business with this name already exists');
+            err.status = 409; // conflict status code
+            return next(err);
+        }
+
+        next();
     } catch (error) {
-      next(error);
+        next(error);
     }
-  });
+});
 
 
-  
+
 module.exports = mongoose.model('Business', BusinessSchema);
