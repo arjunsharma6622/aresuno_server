@@ -80,8 +80,13 @@ const BusinessSchema = new mongoose.Schema({
     modeOfPayment: [],
     ratingsReviews: [
         {
-            userId: {
-                type: mongoose.Schema.Types.ObjectId,
+            user: {
+                name : {
+                    type: String
+                },
+                profileImg : {
+                    type: String
+                }
             },
             rating: {
                 type: Number,

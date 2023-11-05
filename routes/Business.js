@@ -70,7 +70,7 @@ router.patch('/:id', async (req, res) => {
 router.patch('/:id/rating', verification, async (req, res, next) => {
     const { rating, review } = req.body;
     const ratingReview = {
-        userId : req.user.name,
+        user : { name : req.user.name },
         rating,
         review
     }
