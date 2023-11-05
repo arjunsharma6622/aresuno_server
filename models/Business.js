@@ -19,9 +19,13 @@ const BusinessSchema = new mongoose.Schema({
         ref: 'Vendor',
         required: true
     },
-    description: String,
-    website: String,
-    email: String,
+    description: {
+        type: String,
+    },
+    email: {
+        type: String,
+        required: true
+    },
     mainCategory: {
         type: String,
         required: true
@@ -46,15 +50,34 @@ const BusinessSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    timing: {
-        type: String,
-    },
+    timing: [
+        {
+            day: {
+                type: String,
+                enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                required: true
+            },
+            from: {
+                type: String,
+                required: true
+            },
+            to: {
+                type: String,
+                required: true
+            },
+            isOpen: {
+                type: Boolean,
+                default: false
+            }
+        }
+
+    ],
     posts: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Post'
     }],
     photosGallery: [String],
-    modeOfPayment: [String],
+    modeOfPayment: [],
     ratingsReviews: [{
         rating: {
             type: Number,
@@ -64,9 +87,12 @@ const BusinessSchema = new mongoose.Schema({
         }
     }],
     socialLinks: {
-        facebook: String,
+        website: String,
+        instagram: String,
+        whatsapp: String,
         twitter: String,
-        instagram: String
+        facebook: String,
+        youtube: String
     },
     faqs: [{
         question: {
