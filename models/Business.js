@@ -55,15 +55,12 @@ const BusinessSchema = new mongoose.Schema({
             day: {
                 type: String,
                 enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-                required: true
             },
             from: {
                 type: String,
-                required: true
             },
             to: {
                 type: String,
-                required: true
             },
             isOpen: {
                 type: Boolean,
