@@ -98,17 +98,13 @@ module.exports.verification = (req, res, next) => {
             console.log(req.baseUrl)
 
             if (req.baseUrl.includes("business")) {
-                let user;
-
                 console.log('in the business check if block')
                     user = await User.findById(data.id);
                     if (!user) {
                         user = await Vendor.findById(data.id);
 
                     }
-
                 console.log('exit the business check if block')
-
             }
             else if (req.baseUrl.includes("user")) {
                 console.log('in the user check if block')
