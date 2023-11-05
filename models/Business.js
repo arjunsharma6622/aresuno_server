@@ -46,6 +46,9 @@ const BusinessSchema = new mongoose.Schema({
             index: '2dsphere'
         }
     },
+    iframe : {
+        type: String
+    },
     phone: {
         type: String,
         required: true
