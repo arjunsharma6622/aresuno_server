@@ -34,7 +34,7 @@ router.get('/', async (req, res) => {
 // READ ONE
 router.get('/:id', async (req, res) => {
     try {
-        const business = await Business.findById(req.params.id);
+        const business = await Business.findById(req.params.id).populate("posts");
         if (!business) {
             return res.status(404).send("Business not found");
         }
