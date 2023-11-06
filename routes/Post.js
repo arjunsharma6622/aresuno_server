@@ -49,6 +49,43 @@ router.get("/:id", async (req, res, next) => {
     }
 })
 
+router.patch("/:id", async (req, res, next) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) {
+            return res.status(404).send();
+        }
+
+        const updates = Object.keys(req.body);
+        const allowedUpdates = ['image', 'description'];
+        const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
+
+        if (!isValidOperation) {
+            return res.status(400).send({ error: 'Invalid updates!' });
+        }
+
+        updates.forEach((update) => post[update] = req.body[update]);
+        await post.save();
+
+        res.send(post);
+    } catch (error) {
+        res.status(400).send(error);
+    }
+})
+
+router.delete("/:id", async (req, res, next) => {
+    try {
+        const post = await Post.findByIdAndDelete(req.params.id);
+        if (!post) {
+            return res.status(404).send("Post not found (or) Already deleted");
+        }
+
+        res.status(200).send("Post Deleted Successfully");
+    } catch (error) {
+        res.status(500).send(error);
+    }
+})
+
 
 
 
