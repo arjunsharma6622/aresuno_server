@@ -103,6 +103,7 @@ app.use('/api/logout', (req, res) => {
 app.use('/api/business', require('./routes/Business'));
 app.use('/api/user', require('./routes/User'));
 app.use('/api/vendor', require('./routes/Vendor'));
+app.use('/api/post', require('./routes/Post'));
 
 
 
