@@ -56,7 +56,7 @@ router.get('/all-vendors', async (req, res) => {
 
 router.get("/businesses", verification, async (req, res, next) => {
     try {
-        const businesses = await Business.find({ vendorId: req.user._id }).populate("vendorId");
+        const businesses = await Business.find({ vendorId: req.user._id }).populate("posts");
         res.status(201).send(businesses);
     } catch (error) {
         res.status(500).send(error);
