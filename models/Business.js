@@ -37,6 +37,7 @@ const BusinessSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    services : [],
     address: {
         place: {
             type: String,
