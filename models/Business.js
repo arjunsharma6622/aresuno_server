@@ -51,7 +51,8 @@ const BusinessSchema = new mongoose.Schema({
         }
     },
     iframe: {
-        type: String
+        embedLink : String,
+        extractedLink : String
     },
     phone: {
         type: String,

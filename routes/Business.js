@@ -44,21 +44,6 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// UPDATE
-// router.put('/:id', async (req, res) => {
-//     try {
-
-//         const id = req.params.id
-//         console.log(id)
-//         const res = await Business.findByIdAndUpdate()
-//         console.log(res)
-//         res.status(201).send("Business updated successfully")
-//         // const res = await Business.findByIdAndUpdate
-//     } catch (error) {
-//         res.status(400).send(error);
-//     }
-// });
-
 router.put('/:id', async (req, res) => {
     try {
         const id = req.params.id;
