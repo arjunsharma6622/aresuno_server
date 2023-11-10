@@ -45,27 +45,43 @@ router.get('/:id', async (req, res) => {
 });
 
 // UPDATE
-router.patch('/:id', async (req, res) => {
-    const updates = Object.keys(req.body);
-    const allowedUpdates = ['name', 'type', 'profileImg', 'mainCategory', 'subCategory', 'timing', 'phone', 'photosGallery', 'socialLinks', 'faqs', 'address', 'modeOfPayment'];
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
+// router.put('/:id', async (req, res) => {
+//     try {
 
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' });
-    }
+//         const id = req.params.id
+//         console.log(id)
+//         const res = await Business.findByIdAndUpdate()
+//         console.log(res)
+//         res.status(201).send("Business updated successfully")
+//         // const res = await Business.findByIdAndUpdate
+//     } catch (error) {
+//         res.status(400).send(error);
+//     }
+// });
 
+router.put('/:id', async (req, res) => {
     try {
-        const business = await Business.findById(req.params.id);
-        if (!business) {
-            return res.status(404).send();
+        const id = req.params.id;
+        const updates = req.body; // Assuming the updates are sent in the request body
+
+        // Use the findByIdAndUpdate method to update the business record
+        const updatedBusiness = await Business.findByIdAndUpdate(id, updates, { new: true });
+
+        // Check if the business record with the given id exists
+        if (!updatedBusiness) {
+            return res.status(404).send("Business not found");
         }
-        updates.forEach((update) => (business[update] = req.body[update]));
-        await business.save();
-        res.send(business);
+
+        console.log(updatedBusiness);
+        res.status(200).send("Business updated successfully");
     } catch (error) {
-        res.status(400).send(error);
+        console.error(error);
+        res.status(500).send("Internal Server Error");
     }
 });
+
+
+
 
 router.patch('/:id/rating', verification, async (req, res, next) => {
     const { rating, review } = req.body;
