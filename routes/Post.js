@@ -11,10 +11,11 @@ router.post("/create", async (req, res, next) => {
     const { businessId, image, description } = req.body;
 
     try {
-        const cloudinaryResponse = await cloudinary.uploader.upload(image, {
-            folder: "aresuno/posts"
-        })
-        const post = new Post({ businessId, description, image: cloudinaryResponse.secure_url });
+        // const cloudinaryResponse = await cloudinary.uploader.upload(image, {
+        //     folder: "aresuno/posts"
+        // })
+        // const post = new Post({ businessId, description, image: cloudinaryResponse.secure_url });
+        const post = new Post({ businessId, description, image });
         await post.save();
 
         const busiess = await Business.findById(businessId);
