@@ -9,12 +9,18 @@ const { createSecretToken } = require('./utils/SecretToken');
 const app = express();
 const bcrypt = require('bcrypt');
 const cloudinary = require('cloudinary').v2;
+const multer = require('multer');
 
 dotenv.config();
 
 const db = process.env.DB_URL;
 const port = process.env.PORT;
 app.use(express.json());
+
+
+// Configure Multer to handle file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 
 app.use(cors({
@@ -112,93 +118,6 @@ cloudinary.config({
     secure: true
   });
   
-  // Log the configuration
-  console.log(cloudinary.config());
-
-
-  // Upload image function
-  const uploadImage = async (imgPath) => {
-    const options = {
-        use_filename : true,
-        unique_filename : false,
-        overwrite : true
-    }
-
-    try{
-        // upload image
-        const result = await cloudinary.uploader.upload(imgPath, options);
-        console.log(result)
-        return result.public_id
-    }catch(error){
-        console.log(error)
-    }
-  }
-
-  // Define the endpoint for image upload
-//   app.post('/api/upload-image', async (req, res) => {
-//     try {
-//       const { base64Image } = req.body;
-
-//       // Upload the image to Cloudinary
-//       const result = await cloudinary.uploader.upload(base64Image, {
-//         folder: 'uploads',
-//         resource_type: 'image'
-//       });
-
-//       console.log(result)
-
-//       // Return the public URL of the uploaded image
-//       res.json({ imageUrl: result.secure_url });
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).json({ error: 'Image upload failed' });
-//     }
-//   });
-
-app.post('/api/upload-images', async (req, res) => {
-    try {
-      if (!req.files || Object.keys(req.files).length === 0) {
-        return res.status(400).send('No files were uploaded.');
-      }
-  
-      const uploadedImages = [];
-  
-      const imagePromises = req.files.images.map(async (image) => {
-        const result = await cloudinary.uploader.upload(image.tempFilePath, {
-          folder: 'uploads',
-          resource_type: 'image'
-        });
-  
-        uploadedImages.push(result.secure_url);
-      });
-  
-      await Promise.all(imagePromises);
-  
-      res.json({ imageUrls: uploadedImages });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Image upload failed' });
-    }
-  });
-  
-
-
-    // delete image function
-    const deleteImage = async (imgPath) => {
-        try{
-            // upload image
-            const result = await cloudinary.uploader.destroy(imgPath);
-            console.log(result)
-            return result.public_id
-        }catch(error){
-            console.log(error)
-        }
-      }
-
-
-
-
-
 
 
 module.exports = app

@@ -3,13 +3,18 @@ const router = express.Router()
 const Post = require("../models/Post")
 const { verification } = require("../middlewares/authorization")
 const Business = require("../models/Business")
+const cloudinary = require("cloudinary").v2
 
 
 
 router.post("/create", async (req, res, next) => {
+    const { businessId, image, description } = req.body;
+
     try {
-        const { businessId, image, description } = req.body;
-        const post = new Post({ businessId, image, description });
+        const cloudinaryResponse = await cloudinary.uploader.upload(image, {
+            folder: "aresuno/posts"
+        })
+        const post = new Post({ businessId, description, image: cloudinaryResponse.secure_url });
         await post.save();
 
         const busiess = await Business.findById(businessId);
@@ -57,7 +62,7 @@ router.patch("/:id", async (req, res, next) => {
         }
 
         const updates = Object.keys(req.body);
-        const allowedUpdates = ['image', 'description'];
+        const allowedUpdates = ['description'];
         const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 
         if (!isValidOperation) {
