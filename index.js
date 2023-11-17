@@ -10,17 +10,18 @@ const app = express();
 const bcrypt = require('bcrypt');
 const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
+const bodyParser = require('body-parser');
+
 
 dotenv.config();
 
 const db = process.env.DB_URL;
 const port = process.env.PORT;
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+app.use(bodyParser.json({ limit: '100mb' }));
 
-app.use(bodyParser.json({limit: '50mb', extended: true}));
-app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
-app.use(bodyParser.text({ limit: '200mb' }));
 
 
 // Configure Multer to handle file uploads
