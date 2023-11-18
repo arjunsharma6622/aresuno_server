@@ -8,12 +8,12 @@ const { verification } = require('../middlewares/authorization');
 // CREATE
 router.post('/register', async (req, res) => {
     try {
-        const { name, email, password, phone, gender, place } = req.body;
+        const { name, email, password, phone, gender, place, image } = req.body;
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
 
-        const user = new User({ name, email, password: hashedPassword, phone, gender, place });
+        const user = new User({ name, email, password: hashedPassword, phone, gender, place, image });
 
         await user.save();
 
@@ -89,7 +89,7 @@ router.get('/', verification, async (req, res, next) => {
 // UPDATE
 router.patch('/', verification, async (req, res, next) => {
     const updates = Object.keys(req.body);
-    const allowedUpdates = ['name', 'place', 'password'];
+    const allowedUpdates = ['name', 'place', 'password', 'image'];
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 
     if (!isValidOperation) {
