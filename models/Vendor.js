@@ -22,6 +22,9 @@ const VendorSchema = new mongoose.Schema({
         type: String,
         enum: ['male', 'female', 'other'],
     },
+    image : {
+        type: String,
+    },
     businesses: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Business',

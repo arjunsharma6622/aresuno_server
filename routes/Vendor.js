@@ -11,14 +11,14 @@ const Business = require('../models/Business');
 // CREATE
 router.post('/register', async (req, res) => {
     try {
-        const { name, email, password, phone, gender, businesses } = req.body;
+        const { name, email, password, phone, gender, businesses, image } = req.body;
 
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         
 
-        const vendor = new Vendor({ name, email, password: hashedPassword, phone, gender, businesses });
+        const vendor = new Vendor({ name, email, password: hashedPassword, phone, gender, businesses, image });
 
 
         await vendor.save();
@@ -79,7 +79,7 @@ router.get('/',verification, async (req, res, next) => {
 // UPDATE
 router.patch('/', verification, async (req, res, next) => {
     const updates = Object.keys(req.body);
-    const allowedUpdates = ['name', 'password'];
+    const allowedUpdates = ['name', 'password', 'image'];
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 
     if (!isValidOperation) {
