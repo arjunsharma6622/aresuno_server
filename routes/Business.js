@@ -49,6 +49,8 @@ router.put('/:id', async (req, res) => {
         const id = req.params.id;
         const updates = req.body; // Assuming the updates are sent in the request body
 
+        console.log(req.body)
+
         // Use the findByIdAndUpdate method to update the business record
         const updatedBusiness = await Business.findByIdAndUpdate(id, updates, { new: true });
 
