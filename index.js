@@ -113,7 +113,7 @@ app.use('/api/user', require('./routes/User'));
 app.use('/api/vendor', require('./routes/Vendor'));
 app.use('/api/post', require('./routes/Post'));
 app.use('/api/banner', require('./routes/Banner'));
-app.use('/api/category', require('./routes/Banner'));
+app.use('/api/category', require('./routes/Category'));
 
 
 
