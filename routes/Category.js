@@ -23,6 +23,17 @@ router.post('/add', async (req, res) => {
 });
 
 
+router.delete("/:id", async (req, res) => {
+    try{
+        const deletedCategory = await Category.findByIdAndDelete(req.params.id);
+        res.send(deletedCategory).status(200);
+    }
+    catch(err){
+        res.status(500).send(err);
+    }
+})
+
+
 
 
 
