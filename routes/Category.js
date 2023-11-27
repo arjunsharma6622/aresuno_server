@@ -108,10 +108,7 @@ router.post('/addsubcategories', async (req, res) => {
   
       const categories = await Category.find({ _id: { $in: categoryIds } });
   
-      if (categories.length !== categoryIds.length) {
-        return res.status(404).send({ message: 'One or more categories not found' });
-      }
-  
+
       subcategoriesData.forEach((subcategory) => {
         const category = categories.find((cat) => cat._id.toString() === subcategory.categoryId);
         if (category) {
