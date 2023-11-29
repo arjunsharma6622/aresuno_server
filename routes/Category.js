@@ -74,26 +74,6 @@ router.post('/add', async (req, res) => {
   }
 });
 
-// router.post('/addsubcategory/:categoryId', async (req, res) => {
-//   try {
-//     const category = await Category.findById(req.params.categoryId);
-//     if (!category) {
-//       return res.status(404).send({ message: 'Category not found' });
-//     }
-
-//     const newSubcategory = req.body;
-//     category.subcategories.push(newSubcategory);
-//     const savedCategory = await category.save();
-
-//     res.status(201).send(savedCategory);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(400).send(error);
-//   }
-// });
-
-
-
 
 // Add new subcategories to categories
 router.post('/addsubcategories', async (req, res) => {
@@ -130,7 +110,7 @@ router.post('/addsubcategories', async (req, res) => {
       res.status(400).send(error);
     }
   });
-  
+ 
 
 // Delete category
 router.delete("/:id", async (req, res) => {
