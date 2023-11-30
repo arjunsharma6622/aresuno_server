@@ -46,6 +46,10 @@ const SubcategorySchema = new mongoose.Schema({
       required: true,
     },
   },
+  businesses: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Business',
+  }]
 });
 
 const CategorySchema = new mongoose.Schema({
