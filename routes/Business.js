@@ -6,49 +6,49 @@ const { verification } = require("../middlewares/authorization");
 const { ObjectId } = require("mongodb");
 const Category = require("../models/Category");
 
-// CREATE
 router.post("/register", async (req, res) => {
-  try {
-    const newBusiness = new Business(req.body);
-    const mainCategoryId = req.body.mainCategory;
-    const subCategoryId = req.body.subCategory;
+    try {
+      const newBusiness = new Business(req.body);
+      const mainCategoryId = req.body.mainCategory;
+      const subCategoryId = req.body.subCategory;
+  
+      console.log(newBusiness);
+      await newBusiness.save();
+  
+      // updating categories with the newly registered businesses
+      const category = await Category.findById(mainCategoryId);
 
-    console.log(newBusiness);
-    await newBusiness.save();
+      console.log(category);
+
+      const subcategories = category.subcategories;
+        const subcategory = subcategories.find(
+          (subcategory) => subcategory._id.toString() === subCategoryId
+        );
+        subcategory.businesses.push(newBusiness._id);
+        console.log(subcategory);
+
+        console.log(category)
+
+        await category.save();
 
 
 
-    // updating vendor with the newly registered businesses
-    const vendorId = newBusiness.vendorId;
-    await Vendor.updateOne(
-      { _id: vendorId },
-      { $push: { businesses: newBusiness._id } }
-    );
 
-
-
-    // updating categories with the newly registered businesses
-    const category = await Category.findById(mainCategoryId);
-    const updatedSubcategories = category.subcategories.map((subcategory) =>
-      subcategory._id.toString() === subCategoryId
-        ? {
-            ...subcategory,
-            businesses: [...subcategory.businesses, newBusiness._id],
-          }
-        : subcategory
-    );
-
-    await Category.updateOne(
-      { _id: mainCategoryId },
-      { $set: { subcategories: updatedSubcategories } }
-    )
-
-    res.status(201).send(newBusiness);
-  } catch (error) {
-    console.log(error);
-    res.status(400).send(error);
-  }
-});
+  
+      // updating vendor with the newly registered businesses
+      const vendorId = newBusiness.vendorId;
+      await Vendor.updateOne(
+        { _id: vendorId },
+        { $push: { businesses: newBusiness._id } }
+      );
+  
+      res.status(201).send(newBusiness);
+    } catch (error) {
+      console.log(error.message);
+      res.status(400).send(error.message);
+    }
+  });
+  
 
 // READ ALL
 router.get("/", async (req, res) => {
@@ -134,6 +134,19 @@ router.delete("/:id", verification, async (req, res, next) => {
       { $pull: { businesses: new ObjectId(req.params.id) } }
     );
     const updatedVendor = await Vendor.findById(req.user._id);
+
+    const mainCategoryId = business.mainCategory;
+    const subCategoryId = business.subCategory;
+
+    const category = await Category.findById(mainCategoryId);
+    const subcategories = category.subcategories;
+    const subcategory = subcategories.find(
+      (subcategory) => subcategory._id.toString() === subCategoryId
+    );
+    subcategory.businesses = subcategory.businesses.filter(
+      (businessId) => businessId.toString() !== req.params.id
+    )
+    await category.save();
 
     console.log("The updated Venodr is : " + updatedVendor);
 
