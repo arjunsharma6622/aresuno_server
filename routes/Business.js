@@ -73,6 +73,23 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+router.get("/getBusinessByName/:businessName", async (req, res) => {
+  try {
+    const formattedBusinessName = req.params.businessName.replace("-", " ");
+    const business = await Business.findOne({
+      name: { $regex: new RegExp(`^${formattedBusinessName}$`, 'i') },
+    });
+
+    if (!business) {
+      return res.status(404).send("Business not found");
+    }
+
+    res.send(business);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 router.put("/:id", async (req, res) => {
   try {
     const id = req.params.id;
