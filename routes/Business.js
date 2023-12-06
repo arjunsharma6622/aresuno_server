@@ -75,7 +75,8 @@ router.get("/:id", async (req, res) => {
 
 router.get("/getBusinessByName/:businessName", async (req, res) => {
   try {
-    const formattedBusinessName = req.params.businessName.replace("-", " ");
+    const formattedBusinessName = req.params.businessName.replace(/-/g, ' ');
+    console.log(formattedBusinessName)
     const business = await Business.findOne({
       name: { $regex: new RegExp(`^${formattedBusinessName}$`, 'i') },
     });
