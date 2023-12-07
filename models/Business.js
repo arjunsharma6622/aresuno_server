@@ -83,24 +83,10 @@ const BusinessSchema = new mongoose.Schema({
     }],
     photosGallery: [String],
     modeOfPayment: [],
-    ratingsReviews: [
-        {
-            user: {
-                name : {
-                    type: String
-                },
-                profileImg : {
-                    type: String
-                }
-            },
-            rating: {
-                type: Number,
-            },
-            review: {
-                type: String,
-            }
-        }
-    ],
+    ratings: [{
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'Rating'
+    }],
     socialLinks: {
         website: String,
         instagram: String,

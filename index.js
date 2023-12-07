@@ -114,6 +114,7 @@ app.use('/api/vendor', require('./routes/Vendor'));
 app.use('/api/post', require('./routes/Post'));
 app.use('/api/banner', require('./routes/Banner'));
 app.use('/api/category', require('./routes/Category'));
+app.use('/api/rating', require('./routes/Rating'))
 
 
 
