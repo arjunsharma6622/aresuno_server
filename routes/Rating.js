@@ -56,10 +56,11 @@ router.post("/create/:businessId", verification ,async (req, res, next) => {
             rating: req.body.rating,
             review: req.body.review
         })
-        const business = await Business.findById(businessId);
-        business.ratings.push(rating);
-        await business.save();
         await rating.save();
+
+        const business = await Business.findById(businessId);
+        business.ratings.push(rating._id);
+        await business.save();
         res.status(200).send(rating)
     }
     catch(err){
@@ -68,3 +69,5 @@ router.post("/create/:businessId", verification ,async (req, res, next) => {
 })
 
 module.exports = router;
+
+
