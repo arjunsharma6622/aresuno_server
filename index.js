@@ -26,7 +26,7 @@ const upload = multer({ storage: storage });
 
 
 app.use(cors({
-    origin: ['https://aresuno.vercel.app', 'http://localhost:5173'],
+    origin: ['https://aresuno.vercel.app', 'http://localhost:5173', 'http://localhost:3000'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Added OPTIONS method
 }));
