@@ -110,6 +110,51 @@ router.post('/addsubcategories', async (req, res) => {
       res.status(400).send(error);
     }
   });
+
+
+  //update main category title
+  router.put("/:id", async (req, res) => {
+    try{
+      const updatedCategory = await Category.findByIdAndUpdate(req.params.id, req.body, { new: true });
+      res.status(200).send(updatedCategory);
+    }
+    catch(err){
+      res.status(500).send(err);
+    }
+  })
+
+  //update subcategory
+  router.put("/updatesubcategory/:categoryId/:subcategoryId", async (req, res) => {
+    try{
+      const category = await Category.findById(req.params.categoryId);
+      if(!category){
+        return res.status(404).send({ message: 'Category not found' });
+      }
+
+      const subcategoryId = req.params.subcategoryId;
+      const updatedSubcategory = {
+        name: req.body.name,
+        image: {
+          url: req.body.image.url,
+          altTag: req.body.image.altTag,
+        },
+      }
+
+      const updatedSubcategories = category.subcategories.map(subcategory => {
+        if(subcategory._id.toString() === subcategoryId){
+          return updatedSubcategory;
+        }
+        return subcategory;
+      });
+      category.subcategories = updatedSubcategories;
+      const savedCategory = await category.save();
+      res.status(200).send(savedCategory);
+
+    }
+    catch(err){
+      res.status(500).send(err);
+    }
+  })
  
 
 // Delete category
