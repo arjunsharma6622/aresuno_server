@@ -138,6 +138,7 @@ router.post('/addsubcategories', async (req, res) => {
           url: req.body.image.url,
           altTag: req.body.image.altTag,
         },
+        icon : req.body.icon
       }
 
       const updatedSubcategories = category.subcategories.map(subcategory => {
