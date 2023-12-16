@@ -48,7 +48,17 @@ router.post("/register", async (req, res) => {
       res.status(400).send(error.message);
     }
   });
-  
+
+
+router.get("/getAllBusinessesCount", async (req, res) => {
+  try{
+    const businessesCount = await Business.countDocuments({})
+    res.send({businessesCount}).status(200)
+  }
+  catch(error){
+    res.status(500).send(error)
+  }
+})  
 
 // READ ALL
 router.get("/", async (req, res) => {
