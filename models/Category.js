@@ -48,7 +48,7 @@ const SubcategorySchema = new mongoose.Schema({
   },
   icon: {
     type: String,
-    required: true,
+    // required: true,
   },
   businesses: [{
     type: mongoose.Schema.Types.ObjectId,
