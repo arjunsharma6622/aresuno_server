@@ -124,7 +124,7 @@ router.post('/addsubcategories', async (req, res) => {
   })
 
   //update subcategory
-  router.put("/updatesubcategory/:categoryId/:subcategoryId", async (req, res) => {
+  router.patch("/updatesubcategory/:categoryId/:subcategoryId", async (req, res) => {
     try{
       const category = await Category.findById(req.params.categoryId);
       if(!category){
@@ -138,7 +138,8 @@ router.post('/addsubcategories', async (req, res) => {
           url: req.body.image.url,
           altTag: req.body.image.altTag,
         },
-        icon : req.body.icon
+        icon : req.body.icon,
+        businesses : req.body.businesses
       }
 
       const updatedSubcategories = category.subcategories.map(subcategory => {
