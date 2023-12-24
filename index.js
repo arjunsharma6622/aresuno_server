@@ -10,6 +10,8 @@ const app = express();
 const bcrypt = require('bcrypt');
 const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
+const { verification } = require('./middlewares/authorization');
+const jwt = require('jsonwebtoken')
 
 
 dotenv.config();
@@ -98,6 +100,23 @@ app.post('/api/login', async (req, res, next) => {
     }
 });
 
+
+// getUnifiedUserData
+app.get('/api/userData', verification, async (req, res) => {
+    try{
+        let user = await User.findById(req.user._id);
+        let userType = "user"
+        if(!user){
+            user = await Vendor.findById(req.user._id);
+            userType = "vendor"
+        }
+        res.status(200).json({user: user, userType: userType})
+    }
+    catch(error){
+        res.status(500).send(error)
+    }
+})
+
 app.use('/api/logout', (req, res) => {
     res.clearCookie('token', {
         sameSite: 'none',
@@ -105,6 +124,10 @@ app.use('/api/logout', (req, res) => {
     });
     res.status(200).end();
 });
+
+app.post('/api/tokenexpired', verification, (req, res) => {
+    res.status(200).end()
+})
 
 
 // Import routes

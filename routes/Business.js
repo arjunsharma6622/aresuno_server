@@ -30,11 +30,6 @@ router.post("/register", async (req, res) => {
         console.log(category)
 
         await category.save();
-
-
-
-
-  
       // updating vendor with the newly registered businesses
       const vendorId = newBusiness.vendorId;
       await Vendor.updateOne(
@@ -73,7 +68,7 @@ router.get("/", async (req, res) => {
 // READ ONE
 router.get("/:id", async (req, res) => {
   try {
-    const business = await Business.findById(req.params.id).populate("posts");
+    const business = await Business.findById(req.params.id).populate("posts").populate("ratings");
     if (!business) {
       return res.status(404).send("Business not found");
     }
@@ -190,7 +185,7 @@ router.delete("/:id", verification, async (req, res, next) => {
 router.get("/getbusinessesbycategory/:categoryId", async (req, res) => {
   try {
     const categoryId = req.params.categoryId;
-    const businesses = await Business.find({ subCategory: categoryId });
+    const businesses = await Business.find({ subCategory: categoryId }).populate("ratings");
     res.status(202).send(businesses);
   } catch (error) {
     console.log(error);

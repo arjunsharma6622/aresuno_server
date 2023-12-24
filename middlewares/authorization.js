@@ -19,7 +19,7 @@ module.exports.verification = (req, res, next) => {
         } else {
             var user;
 
-            if (req.baseUrl.includes("business") || req.baseUrl.includes("rating")) {
+            if (req.baseUrl.includes("business") || req.baseUrl.includes("rating") || req.baseUrl.includes("")) {
                     user = await User.findById(data.id);
 
                     if (!user) {
@@ -47,4 +47,23 @@ module.exports.verification = (req, res, next) => {
             next();
         }
     });
+};
+
+module.exports.isTokenExpired = (req, res, next) => {
+    if (req.headers.authorization) {
+        const token = req.headers.authorization.split(' ')[1];
+        if (token) {
+            jwt.verify(token, process.env.TOKEN_KEY, (err, decoded) => {
+                if (err) {
+                    return res.status(401).json({ message: "Unauthorized" });
+                } else {
+                    next();
+                }
+            });
+        } else {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+    } else {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
 };
