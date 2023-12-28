@@ -133,6 +133,7 @@ router.post('/addsubcategories', async (req, res) => {
 
       const subcategoryId = req.params.subcategoryId;
       const updatedSubcategory = {
+        _id: subcategoryId,
         name: req.body.name,
         image: {
           url: req.body.image.url,
