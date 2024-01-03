@@ -30,11 +30,29 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 
+// app.use(cors({
+//     origin: "*",
+//     credentials: true,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Added OPTIONS method
+// }));
+
+
+const allowedOrigins = ["https://aresuno.com", "http://localhost:5173", "http://localhost:3000"]; // Add your actual allowed origins
+
 app.use(cors({
-    origin: "*",
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Added OPTIONS method
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true, // If needed for cookies or authentication
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH']
 }));
+
+
 app.use(cookieParser());
 // ss
 
