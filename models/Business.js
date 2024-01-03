@@ -42,8 +42,11 @@ const BusinessSchema = new mongoose.Schema({
         place: {
             type: String,
         },
+        city : {
+            type : String
+        },
         pincode: {
-            type: String,
+            type: Number,
         },
         coordinates: {
             type: [Number], // [longitude, latitude]

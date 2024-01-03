@@ -45,6 +45,33 @@ router.post("/register", async (req, res) => {
   });
 
 
+  router.get("/getNearbyBusinesses", async (req, res) => {
+    try{
+      console.log('ssss')
+      const lat = req.query.lat;
+      const long = req.query.long;
+      console.log(lat, long);
+      const businesses = await Business.find({
+        'address.coordinates' : {
+          $near : {
+            $geometry : {
+              type : "Point",
+              coordinates : [long, lat]
+            },
+            $maxDistance : 1000000
+          }
+        }
+      })
+  
+      res.status(202).send(businesses);
+    }
+    catch(error){
+      console.log(error);
+      res.status(500).send(error);
+    }
+  })
+
+
 router.get("/getAllBusinessesCount", async (req, res) => {
   try{
     const businessesCount = await Business.countDocuments({})
@@ -192,5 +219,8 @@ router.get("/getbusinessesbycategory/:categoryId", async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+
+
 
 module.exports = router;

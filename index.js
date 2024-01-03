@@ -12,12 +12,15 @@ const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
 const { verification } = require('./middlewares/authorization');
 const jwt = require('jsonwebtoken')
+const axios = require('axios');
+const { json } = require('body-parser');
 
 
 dotenv.config();
 
 const db = process.env.DB_URL;
 const port = process.env.PORT;
+const googleMapKey = process.env.GOOGLE_MAP_KEY;
 app.use(express.json());
 
 
@@ -50,6 +53,15 @@ app.listen(port, () => {
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
+
+
+// app.get('/map', async (req, res) => {
+//     const response = await axios.get("https://maps.googleapis.com/maps/api/geocode/json?latlng=17.367050190970474,78.52029958703778&key=")
+//     const address = response.data.results[0].formatted_address
+//     console.log(address)
+//     console.log(response.data)
+//     res.json(response.data)
+// })
 
 
 
@@ -128,6 +140,19 @@ app.use('/api/logout', (req, res) => {
 app.post('/api/tokenexpired', verification, (req, res) => {
     res.status(200).end()
 })
+
+
+app.get('/api/getLocationFromLatLong', async (req, res) => {
+    const lat = req.query.lat
+    const long = req.query.long
+    
+    const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${googleMapKey}`)
+    const location = response.data.results[0].formatted_address
+    console.log(response.data.results)
+    console.log(location)
+    res.json(location)
+})
+
 
 
 // Import routes
