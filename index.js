@@ -173,6 +173,50 @@ app.get('/api/getLocationFromLatLong', async (req, res) => {
 
 
 
+
+app.get('/api/autocomplete', async (req, res) => {
+    const input = req.query.input; // Get the input query parameter from the request
+    console.log(input)
+    const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&key=${googleMapKey}&types=(regions)`;
+  
+    try {
+      const response = await axios.get(url);
+      const predictions = response.data.predictions;
+  
+      if (predictions && predictions.length > 0) {
+        const placeId = predictions[0].place_id; // Get the place ID from the first prediction
+        const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${googleMapKey}`;
+  
+        const detailsResponse = await axios.get(detailsUrl);
+        const { address_components } = detailsResponse.data.result;
+  
+        // Extract required details (state, country, pin number, district, etc.)
+        const extractedDetails = {
+          state: address_components.find(component => component.types.includes('administrative_area_level_1'))?.long_name || '',
+          country: address_components.find(component => component.types.includes('country'))?.long_name || '',
+          postalCode: address_components.find(component => component.types.includes('postal_code'))?.long_name || '',
+          city: address_components.find(component => component.types.includes('locality'))?.long_name || '',
+          street: address_components.find(component => component.types.includes('route'))?.long_name || '',
+          building: address_components.find(component => component.types.includes('subpremise'))?.long_name || '',
+          pinNumber: address_components.find(component => component.types.includes('postal_code_suffix'))?.long_name || '',
+          placeId: placeId
+
+
+          // Add more details as needed
+        };
+  
+        res.status(200).send(extractedDetails);
+      } else {
+        res.status(404).send({ message: 'No predictions found' });
+      }
+    } catch (error) {
+      console.error('Error fetching details:', error);
+      res.status(500).send({ message: 'Internal Server Error' });
+    }
+  });
+
+
+
 // Import routes
 app.use('/api/business', require('./routes/Business'));
 app.use('/api/user', require('./routes/User'));

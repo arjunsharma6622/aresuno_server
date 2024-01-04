@@ -45,31 +45,88 @@ router.post("/register", async (req, res) => {
   });
 
 
+  // router.get("/getNearbyBusinesses", async (req, res) => {
+    // router.get("/getNearbyBusinesses", async (req, res) => {
+    //   try {
+    //     const lat = req.query.lat;  // Access lat using req.query.lat
+    //     const long = req.query.long;  // Access long using req.query.long
+
+
+    //     // Ensure that lat and long are provided in the query parameters
+    //     if (!lat || !long) {
+    //       return res.status(400).send({ message: "Latitude and longitude are required." });
+    //     }
+    
+    //     console.log("Fetching businesses near coordinates:", lat, long);
+    
+    //     const businesses = await Business.aggregate([
+    //       {
+    //         $geoNear: {
+    //           near: {
+    //             type: "Point",
+    //             coordinates: [parseFloat(long), parseFloat(lat)]
+    //           },
+    //           distanceField: "distance",  // Adds a field 'distance' to each document representing the distance
+    //           maxDistance: 1000000,  // 100 kilometers; adjust as per your requirement
+    //           spherical: true  // Indicates the use of spherical geometry (for Earth-like sphere)
+    //         }
+    //       }
+    //     ]);
+    
+    //     res.status(200).send(businesses);  // Sending a 200 OK response
+    //   } catch (error) {
+    //     console.error("Error fetching nearby businesses:", error);
+    //     res.status(500).send({ message: "Internal Server Error" });  // Sending a 500 Internal Server Error response
+    //   }
+    // });
+    
+  // })
+
+
   router.get("/getNearbyBusinesses", async (req, res) => {
-    try{
-      console.log('ssss')
-      const lat = req.query.lat;
-      const long = req.query.long;
-      console.log(lat, long);
-      const businesses = await Business.find({
-        'address.coordinates' : {
-          $near : {
-            $geometry : {
-              type : "Point",
-              coordinates : [long, lat]
+    try {
+      const lat = req.query.lat;  // Access lat using req.query.lat
+      const long = req.query.long;  // Access long using req.query.long
+      const categoryId = req.query.categoryId;  // Access categoryId using req.query.categoryId
+  
+      // Ensure that lat and long are provided in the query parameters
+      if (!lat || !long) {
+        return res.status(400).send({ message: "Latitude and longitude are required." });
+      }
+  
+      console.log("Fetching businesses near coordinates:", lat, long);
+  
+      let aggregationPipeline = [
+        {
+          $geoNear: {
+            near: {
+              type: "Point",
+              coordinates: [parseFloat(long), parseFloat(lat)]
             },
-            $maxDistance : 1000000
+            distanceField: "distance",  // Adds a field 'distance' to each document representing the distance
+            maxDistance: 100000,  // 100 kilometers; adjust as per your requirement
+            spherical: true  // Indicates the use of spherical geometry (for Earth-like sphere)
           }
         }
-      })
+      ];
   
-      res.status(202).send(businesses);
+      // If categoryId is provided, add a $match stage to filter businesses by subCategory
+      if (categoryId) {
+        aggregationPipeline.push({
+          $match: {
+            subCategory: categoryId  // Assuming categoryId matches the subCategory string
+          }
+        });
+      }
+  
+      const businesses = await Business.aggregate(aggregationPipeline);
+  
+      res.status(200).send(businesses);  // Sending a 200 OK response
+    } catch (error) {
+      console.error("Error fetching nearby businesses:", error);
+      res.status(500).send({ message: "Internal Server Error" });  // Sending a 500 Internal Server Error response
     }
-    catch(error){
-      console.log(error);
-      res.status(500).send(error);
-    }
-  })
+  });
 
 
 router.get("/getAllBusinessesCount", async (req, res) => {
@@ -219,6 +276,10 @@ router.get("/getbusinessesbycategory/:categoryId", async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+
+
+
 
 
 
