@@ -160,17 +160,56 @@ app.post('/api/tokenexpired', verification, (req, res) => {
 })
 
 
-app.get('/api/getLocationFromLatLong', async (req, res) => {
-    const lat = req.query.lat
-    const long = req.query.long
+// app.get('/api/getLocationFromLatLong', async (req, res) => {
+//     const lat = req.query.lat
+//     const long = req.query.long
     
-    const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${googleMapKey}`)
-    const location = response.data.results[0].formatted_address
-    console.log(response.data.results)
-    console.log(location)
-    res.json(location)
-})
+//     const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${googleMapKey}`)
+//     const location = response.data.results[0].formatted_address
+//     console.log(response.data.results)
+//     console.log(location)
+//     res.json(location)
+// })
 
+
+
+app.get('/api/getLocationFromLatLong', async (req, res) => {
+    try {
+      const lat = req.query.lat;
+      const long = req.query.long;
+  
+      const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${googleMapKey}`);
+  
+      // Check if the response contains results and results array has at least one item
+      if (response.data.results && response.data.results.length > 0) {
+        const location = response.data.results[0];
+  
+        // Construct the desired format from the location details
+        const formattedLocation = {
+          value: location.formatted_address,
+          area: '', // You can set this value based on your requirements
+          city: location.address_components.find(component => component.types.includes('locality'))?.long_name || '',
+          dcity: location.address_components.find(component => component.types.includes('administrative_area_level_2'))?.long_name || '',
+          state: location.address_components.find(component => component.types.includes('administrative_area_level_1'))?.long_name || '',
+          country: location.address_components.find(component => component.types.includes('country'))?.long_name || '',
+          pincode: location.address_components.find(component => component.types.includes('postal_code'))?.long_name || '',
+          lat: location.geometry.location.lat,
+          long: location.geometry.location.lng,
+          type: 'City', // You can set this value based on your requirements
+          mobicode: 'in', // You can set this value based on your requirements
+          isExact: 0 // You can set this value based on your requirements
+        };
+  
+        console.log(formattedLocation);
+        res.json(formattedLocation);
+      } else {
+        res.status(404).json({ message: 'No location details found for the provided latitude and longitude.' });
+      }
+    } catch (error) {
+      console.error('Error fetching location details:', error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  });
 
 
 
