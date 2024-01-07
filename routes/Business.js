@@ -9,7 +9,7 @@ const Category = require("../models/Category");
 router.post("/register", async (req, res) => {
     try {
       const newBusiness = new Business(req.body);
-      const categoryID = req.body.mainCategory;
+      const categoryID = req.body.category;
   
       console.log(newBusiness);
       await newBusiness.save();
