@@ -19,6 +19,10 @@ const BusinessSchema = new mongoose.Schema({
         ref: 'Vendor',
         required: true
     },
+    foundedIn : {
+        type: Date,
+        required: true
+    },
     vendorName:{
         type: String
     },
@@ -29,13 +33,10 @@ const BusinessSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    mainCategory: {
-        type: String,
-        required: true
-    },
-    subCategory: {
-        type: String,
-        required: true
+    category : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'Category',
+        required : true
     },
     services : [],
     address: {

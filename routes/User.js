@@ -4,11 +4,23 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const { createSecretToken } = require('../utils/SecretToken');
 const { verification } = require('../middlewares/authorization');
+const Vendor = require('../models/Vendor');
 
 // CREATE
 router.post('/register', async (req, res) => {
     try {
         const { name, email, password, phone, gender, place, image } = req.body;
+
+
+                // Check if the email already exists in either Vendor or User collections
+                const vendorExists = await Vendor.findOne({ email: email });
+                const userExists = await User.findOne({ email: email });
+        
+                if (vendorExists || userExists) {
+                    return res.status(400).send({ message: 'Email already in use for registration.' });
+                }
+
+
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 

@@ -13,18 +13,24 @@ router.post('/register', async (req, res) => {
     try {
         const { name, email, password, phone, gender, businesses, image } = req.body;
 
+        // Check if the email already exists in either Vendor or User collections
+        const vendorExists = await Vendor.findOne({ email: email });
+        const userExists = await User.findOne({ email: email });
+
+        if (vendorExists || userExists) {
+            return res.status(400).send({ message: 'Email already in use for registration.' });
+        }
+
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        
-
         const vendor = new Vendor({ name, email, password: hashedPassword, phone, gender, businesses, image });
-
 
         await vendor.save();
 
         const token = createSecretToken(vendor._id);
         console.log(token);
+        
         res.cookie('token', token, {
             maxAge: 24 * 60 * 60 * 1000, // 1 day
             sameSite: 'none',
@@ -33,12 +39,13 @@ router.post('/register', async (req, res) => {
             httpOnly: false          
         });
 
-        res.status(201).send({vendor : vendor, token : token});
+        res.status(201).send({ vendor: vendor, token: token });
     } catch (error) {
-        console.log('eerrr')
+        console.log('Error occurred:', error);
         res.status(400).send(error);
     }
 });
+
 
 
 
