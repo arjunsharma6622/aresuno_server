@@ -9,23 +9,18 @@ const Category = require("../models/Category");
 router.post("/register", async (req, res) => {
     try {
       const newBusiness = new Business(req.body);
-      const mainCategoryId = req.body.mainCategory;
-      const subCategoryId = req.body.subCategory;
+      const categoryID = req.body.mainCategory;
   
       console.log(newBusiness);
       await newBusiness.save();
   
       // updating categories with the newly registered businesses
-      const category = await Category.findById(mainCategoryId);
+      const category = await Category.findById(categoryID);
 
       console.log(category);
 
-      const subcategories = category.subcategories;
-        const subcategory = subcategories.find(
-          (subcategory) => subcategory._id.toString() === subCategoryId
-        );
-        subcategory.businesses.push(newBusiness._id);
-        console.log(subcategory);
+      category.businesses.push(newBusiness._id);
+
 
         console.log(category)
 
