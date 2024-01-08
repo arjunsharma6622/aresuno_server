@@ -3,8 +3,9 @@ const router = express.Router();
 const Business = require("../models/Business");
 const Vendor = require("../models/Vendor");
 const { verification } = require("../middlewares/authorization");
-const { ObjectId } = require("mongodb");
 const Category = require("../models/Category");
+const mongoose = require("mongoose");
+const { ObjectId } = require("mongodb");
 
 router.post("/register", async (req, res) => {
     try {
@@ -90,6 +91,8 @@ router.post("/register", async (req, res) => {
       }
   
       console.log("Fetching businesses near coordinates:", lat, long);
+      console.log("Fetching businesses by category:", categoryId);
+      
   
       let aggregationPipeline = [
         {
@@ -109,7 +112,7 @@ router.post("/register", async (req, res) => {
       if (categoryId) {
         aggregationPipeline.push({
           $match: {
-            subCategory: categoryId  // Assuming categoryId matches the subCategory string
+            category: new mongoose.Types.ObjectId(categoryId)
           }
         });
       }
@@ -264,7 +267,7 @@ router.delete("/:id", verification, async (req, res, next) => {
 router.get("/getbusinessesbycategory/:categoryId", async (req, res) => {
   try {
     const categoryId = req.params.categoryId;
-    const businesses = await Business.find({ subCategory: categoryId }).populate("ratings");
+    const businesses = await Business.find({ category: categoryId }).populate("ratings");
     res.status(202).send(businesses);
   } catch (error) {
     console.log(error);
