@@ -40,14 +40,20 @@ const BusinessSchema = new mongoose.Schema({
     },
     services : [],
     address: {
-        place: {
+        street: {
             type: String,
         },
-        city : {
+        Landmark : {
             type : String
         },
         pincode: {
             type: Number,
+        },
+        city: {
+            type: String,
+        },
+        state: {
+            type: String,
         },
         coordinates: {
             type: [Number], // [longitude, latitude]
@@ -86,7 +92,7 @@ const BusinessSchema = new mongoose.Schema({
         ref: 'Post'
     }],
     photosGallery: [String],
-    modeOfPayment: [],
+    modeOfPayment: [{name : String, icon : String}],
     ratings: [{
         type : mongoose.Schema.Types.ObjectId,
         ref : 'Rating'
