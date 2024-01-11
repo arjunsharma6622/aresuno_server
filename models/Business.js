@@ -91,7 +91,15 @@ const BusinessSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Post'
     }],
-    photosGallery: [String],
+    images : {
+        logo : {
+            type : String
+        },
+        cover : {
+            type : String
+        },
+        gallery : [String]
+    },
     modeOfPayment: [{name : String, icon : String}],
     ratings: [{
         type : mongoose.Schema.Types.ObjectId,
