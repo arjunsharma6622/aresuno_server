@@ -43,13 +43,16 @@ const BusinessSchema = new mongoose.Schema({
         street: {
             type: String,
         },
-        Landmark : {
+        landmark : {
             type : String
         },
         pincode: {
             type: Number,
         },
         city: {
+            type: String,
+        },
+        district: {
             type: String,
         },
         state: {

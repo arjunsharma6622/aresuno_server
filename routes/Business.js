@@ -240,18 +240,12 @@ router.delete("/:id", verification, async (req, res, next) => {
     );
     const updatedVendor = await Vendor.findById(req.user._id);
 
-    const mainCategoryId = business.mainCategory;
-    const subCategoryId = business.subCategory;
+    const categoryId = business.category;
 
-    const category = await Category.findById(mainCategoryId);
-    const subcategories = category.subcategories;
-    const subcategory = subcategories.find(
-      (subcategory) => subcategory._id.toString() === subCategoryId
-    );
-    subcategory.businesses = subcategory.businesses.filter(
-      (businessId) => businessId.toString() !== req.params.id
-    )
+    const category = await Category.findById(categoryId);
+    category.businesses.pull(req.params.id);
     await category.save();
+
 
     console.log("The updated Venodr is : " + updatedVendor);
 
