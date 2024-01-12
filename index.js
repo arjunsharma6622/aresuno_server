@@ -255,6 +255,21 @@ app.get('/api/autocomplete', async (req, res) => {
   });
 
 
+//get lat, lng from address
+app.get('/api/getLatLongFromAddress', async (req, res) => {
+    try {
+        const address = req.query.address
+        const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${googleMapKey}`)
+        const lat = response.data.results[0].geometry.location.lat
+        const lng = response.data.results[0].geometry.location.lng
+        res.json({ lat: lat, lng: lng })
+    }
+    catch (error) {
+        res.status(500).send(error)
+    }
+})
+
+
 
 // Import routes
 app.use('/api/business', require('./routes/Business'));
