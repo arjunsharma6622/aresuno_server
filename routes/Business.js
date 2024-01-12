@@ -150,7 +150,7 @@ router.get("/", async (req, res) => {
 // READ ONE
 router.get("/:id", async (req, res) => {
   try {
-    const business = await Business.findById(req.params.id).populate("posts").populate("ratings");
+    const business = await Business.findById(req.params.id).populate("posts").populate("ratings").populate({path : "category", select : "name"});
     if (!business) {
       return res.status(404).send("Business not found");
     }

@@ -23,18 +23,19 @@ const port = process.env.PORT;
 const googleMapKey = process.env.GOOGLE_MAP_KEY;
 app.use(express.json());
 
-
-
 // Configure Multer to handle file uploads
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+// Initialize Cloudinary (make sure to set your cloudinary configuration)
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
-// app.use(cors({
-//     origin: "*",
-//     credentials: true,
-//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Added OPTIONS method
-// }));
+console.log('Cloudinary configuration:', cloudinary.config());
+
 
 
 const allowedOrigins = ["https://aresuno.com", "http://localhost:5173", "http://localhost:3000"]; // Add your actual allowed origins
@@ -54,7 +55,6 @@ app.use(cors({
 
 
 app.use(cookieParser());
-// ss
 
 // Connect to MongoDB database
 mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -71,17 +71,6 @@ app.listen(port, () => {
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
-
-
-// app.get('/map', async (req, res) => {
-//     const response = await axios.get("https://maps.googleapis.com/maps/api/geocode/json?latlng=17.367050190970474,78.52029958703778&key=")
-//     const address = response.data.results[0].formatted_address
-//     console.log(address)
-//     console.log(response.data)
-//     res.json(response.data)
-// })
-
-
 
 // Unified Login Endpoint
 app.post('/api/login', async (req, res, next) => {
@@ -158,19 +147,6 @@ app.use('/api/logout', (req, res) => {
 app.post('/api/tokenexpired', verification, (req, res) => {
     res.status(200).end()
 })
-
-
-// app.get('/api/getLocationFromLatLong', async (req, res) => {
-//     const lat = req.query.lat
-//     const long = req.query.long
-    
-//     const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${googleMapKey}`)
-//     const location = response.data.results[0].formatted_address
-//     console.log(response.data.results)
-//     console.log(location)
-//     res.json(location)
-// })
-
 
 
 app.get('/api/getLocationFromLatLong', async (req, res) => {
@@ -283,10 +259,6 @@ app.use('/api/rating', require('./routes/Rating'))
 
 
 
-// Return "https" URLs by setting secure: true
-cloudinary.config({
-    secure: true
-  });
   
 
 

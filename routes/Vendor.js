@@ -82,7 +82,8 @@ router.get("/businesses", verification, async (req, res, next) => {
                     path: "userId",
                     model: "User",
                 },
-            });
+            })
+            .populate({path : "category", select : "name"});
 
         res.status(201).send(businesses);
     } catch (error) {
