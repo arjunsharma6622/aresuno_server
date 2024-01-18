@@ -123,6 +123,10 @@ const BusinessSchema = new mongoose.Schema({
         answer: {
             type: String,
         }
+    }],
+    callLeads : [{
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'CallLead',
     }]
 }, {
     timestamps: true

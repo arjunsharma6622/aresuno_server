@@ -256,6 +256,8 @@ app.use('/api/banner', require('./routes/Banner'));
 app.use('/api/category', require('./routes/Category'));
 app.use('/api/category-title', require('./routes/CategoryTitle'));
 app.use('/api/rating', require('./routes/Rating'))
+app.use('/api/enquiry', require('./routes/Enquiry'))
+app.use('/api/call-lead', require('./routes/CallLead'))
 
 
 
