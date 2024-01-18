@@ -38,7 +38,7 @@ console.log('Cloudinary configuration:', cloudinary.config());
 
 
 
-const allowedOrigins = ["https://www.aresuno.com", "https://aresuno.com", "http://localhost:5173", "http://localhost:3000"]; // Add your actual allowed origins
+const allowedOrigins = ["https://www.aresuno.com", "www.aresuno.com", "aresuno.com",  "https://aresuno.com", "http://localhost:5173", "http://localhost:3000"]; // Add your actual allowed origins
 
 app.use(cors({
   origin: function (origin, callback) {
