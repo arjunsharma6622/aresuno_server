@@ -14,6 +14,7 @@ const { verification } = require('./middlewares/authorization');
 const jwt = require('jsonwebtoken')
 const axios = require('axios');
 const { json } = require('body-parser');
+const SendOtp = require('sendotp');
 
 
 dotenv.config();
@@ -22,6 +23,16 @@ const db = process.env.DB_URL;
 const port = process.env.PORT;
 const googleMapKey = process.env.GOOGLE_MAP_KEY;
 app.use(express.json());
+
+// const sendOtp = new SendOtp(process.env.SEND_OTP_API_KEY );
+
+// sendOtp.send('919700812822', '', (error, data) => {
+//   if (error) {
+//     console.log(error);
+//   } else {
+//     console.log(data);
+//   }
+// });
 
 // Configure Multer to handle file uploads
 const storage = multer.memoryStorage();
@@ -135,6 +146,8 @@ app.get('/api/userData', verification, async (req, res) => {
         res.status(500).send(error)
     }
 })
+
+
 
 app.use('/api/logout', (req, res) => {
     res.clearCookie('token', {

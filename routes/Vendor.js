@@ -46,10 +46,6 @@ router.post('/register', async (req, res) => {
     }
 });
 
-
-
-
-
 // READ ALL
 router.get('/all-vendors', async (req, res) => {
     try {
@@ -61,18 +57,9 @@ router.get('/all-vendors', async (req, res) => {
 });
 
 
-// router.get("/businesses", verification, async (req, res, next) => {
-//     try {
-//         const businesses = await Business.find({ vendorId: req.user._id }).populate("posts").populate("ratings")
-//         res.status(201).send(businesses);
-//     } catch (error) {
-//         res.status(500).send(error);
-//     }
-// })
-
-
-
 router.get("/businesses", verification, async (req, res, next) => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    
     try {
         const businesses = await Business.find({ vendorId: req.user._id })
             .populate("posts")
@@ -86,7 +73,130 @@ router.get("/businesses", verification, async (req, res, next) => {
             .populate({path : "category", select : "name"})
             .populate("callLeads")
 
+
+        const allCallLeads = businesses.flatMap(business => business.callLeads)
+        console.log(allCallLeads)
+
         res.status(201).send(businesses);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+
+
+// router.get("/getAllLeads", verification, async (req, res, next) => {
+//     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    
+//     try {
+//         const businesses = await Business.find({ vendorId: req.user._id }).populate("callLeads")
+
+
+//         const allCallLeads = businesses.flatMap(business => business.callLeads)
+//         console.log(allCallLeads)
+
+//         res.status(201).send();
+//     } catch (error) {
+//         res.status(500).send(error);
+//     }
+// });
+
+
+// router.get("/getAllCallLeads", verification, async (req, res, next) => {
+//     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+//     try {
+//         const businesses = await Business.find({ vendorId: req.user._id }).populate("callLeads");
+
+//         const allCallLeads = businesses.flatMap(business => business.callLeads);
+
+//         // Create a mapping to group leads by month
+//         const leadsByMonth = allCallLeads.reduce((acc, lead) => {
+//             const leadDate = new Date(lead.date); // Assuming lead.date is the date property of your lead object
+//             const monthIndex = leadDate.getMonth();
+//             const monthName = months[monthIndex];
+
+//             if (!acc[monthName]) {
+//                 acc[monthName] = [];
+//             }
+
+//             acc[monthName].push(lead);
+//             return acc;
+//         }, {});
+
+//         console.log(leadsByMonth);
+
+//         res.status(201).send();
+//     } catch (error) {
+//         res.status(500).send(error);
+//     }
+// });
+
+
+// router.get("/getAllCallLeads", verification, async (req, res, next) => {
+//     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+//     try {
+//         const businesses = await Business.find({ vendorId: req.user._id }).populate("callLeads");
+
+//         const allCallLeads = businesses.flatMap(business => business.callLeads);
+
+//         // Create a mapping to count leads by month
+//         const leadsCountByMonth = allCallLeads.reduce((acc, lead) => {
+//             const leadDate = new Date(lead.date); // Assuming lead.date is the date property of your lead object
+//             const monthIndex = leadDate.getMonth();
+//             const monthName = months[monthIndex];
+
+//             if (!acc[monthName]) {
+//                 acc[monthName] = 1;
+//             } else {
+//                 acc[monthName]++;
+//             }
+
+//             return acc;
+//         }, {});
+
+//         console.log(leadsCountByMonth);
+
+//         res.status(201).send();
+//     } catch (error) {
+//         res.status(500).send(error);
+//     }
+// });
+
+
+
+router.get("/getAllCallLeads", verification, async (req, res, next) => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    try {
+        const businesses = await Business.find({ vendorId: req.user._id }).populate("callLeads");
+
+        const allCallLeads = businesses.flatMap(business => business.callLeads);
+
+        // Create a mapping to count leads by month
+        const leadsCountByMonth = allCallLeads.reduce((acc, lead) => {
+            const leadDate = new Date(lead.createdAt); // Assuming lead.date is the date property of your lead object
+            const monthIndex = leadDate.getMonth();
+            const monthName = months[monthIndex];
+
+            if (!acc[monthName]) {
+                acc[monthName] = 1;
+            } else {
+                acc[monthName]++;
+            }
+
+            return acc;
+        }, {});
+
+        // Convert the counts to the desired format
+        const graphData = months.map(month => ({
+            name: month,
+            Leads: leadsCountByMonth[month] || 0, // Default to 0 if there are no leads for the month
+        }));
+
+        console.log(graphData);
+
+        res.status(201).json(graphData);
     } catch (error) {
         res.status(500).send(error);
     }

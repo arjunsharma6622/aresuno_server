@@ -25,6 +25,7 @@
     "mongoose": "^7.6.1",
     "msg91": "^2.1.4",
     "multer": "^1.4.5-lts.1",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "sendotp": "^1.2.9"
   }
 }
