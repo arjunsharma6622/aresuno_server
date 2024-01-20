@@ -284,7 +284,7 @@ app.post('/api/send-otp', async (req, res) => {
 
 app.post('/api/forgetPassword-otp', async (req, res) => {
   try{
-    const phone = '9700812822';
+    const phone = req.body.phone;
     const otp = Math.floor(1000 + Math.random() * 9000);
     let user = await User.findOne({ phone });
     if(!user){
