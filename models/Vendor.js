@@ -13,6 +13,9 @@ const VendorSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
+        unique: true,
+        index : true,
+        required: true
     },
     password: {
         type: String,
@@ -28,7 +31,20 @@ const VendorSchema = new mongoose.Schema({
     businesses: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Business',
-    }]
+    }],
+    otp : {
+        value : {
+            type: String
+        },
+        expires : {
+            type: Date
+        },
+        createdAt : {
+            type: Date
+        }
+    },
+}, {
+    timestamps: true
 });
 
 module.exports = mongoose.model('Vendor', VendorSchema);

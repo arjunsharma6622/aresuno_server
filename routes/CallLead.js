@@ -21,7 +21,7 @@ router.post('/create', async (req, res) => {
 //get all call leads
 router.get('/', async (req, res) => {
     try {
-        const leads = await CallLead.find();
+        const leads = await CallLead.find().populate('business');
         res.status(200).send(leads);
     }
     catch(err) {

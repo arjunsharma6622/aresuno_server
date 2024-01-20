@@ -1,11 +1,17 @@
 const express = require('express');
 const Enquiry = require('../models/Enquiry');
+const Business = require('../models/Business');
 const router = express.Router();
 
 
 router.post('/create', async (req, res) => {
     try {
         const newEnquiry = new Enquiry(req.body);
+        if(req.body.business) {
+            const business = await Business.findById(req.body.business);
+            business.enquiries.push(newEnquiry._id);
+            await business.save();
+        }
         await newEnquiry.save();
         res.status(200).send(newEnquiry);
     }
@@ -16,7 +22,7 @@ router.post('/create', async (req, res) => {
 
 router.get('/', async (req, res) => {
     try {
-        const enquiries = await Enquiry.find();
+        const enquiries = await Enquiry.find().populate('category').populate('business');
         res.status(200).send(enquiries);
     }
     catch(err) {

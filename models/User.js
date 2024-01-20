@@ -17,6 +17,9 @@ const userSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
+        required: true,
+        unique: true,
+        index : true
     },
     gender: {
         type: String,
@@ -27,7 +30,18 @@ const userSchema = new mongoose.Schema({
     },
     image : {
         type: String
-    }
+    },
+    otp : {
+        value : {
+            type: String
+        },
+        expires : {
+            type: Date
+        },
+    },
+
+}, {
+    timestamps: true
 });
 
 module.exports = mongoose.model('User', userSchema);

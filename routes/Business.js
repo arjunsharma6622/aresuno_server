@@ -140,7 +140,7 @@ router.get("/getAllBusinessesCount", async (req, res) => {
 // READ ALL
 router.get("/", async (req, res) => {
   try {
-    const businesses = await Business.find({});
+    const businesses = await Business.find({}).populate("category");
     res.send(businesses);
   } catch (error) {
     res.status(500).send(error);

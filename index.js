@@ -14,25 +14,16 @@ const { verification } = require('./middlewares/authorization');
 const jwt = require('jsonwebtoken')
 const axios = require('axios');
 const { json } = require('body-parser');
-const SendOtp = require('sendotp');
-
 
 dotenv.config();
+
+
 
 const db = process.env.DB_URL;
 const port = process.env.PORT;
 const googleMapKey = process.env.GOOGLE_MAP_KEY;
 app.use(express.json());
 
-// const sendOtp = new SendOtp(process.env.SEND_OTP_API_KEY );
-
-// sendOtp.send('919700812822', '', (error, data) => {
-//   if (error) {
-//     console.log(error);
-//   } else {
-//     console.log(data);
-//   }
-// });
 
 // Configure Multer to handle file uploads
 const storage = multer.memoryStorage();
@@ -257,6 +248,139 @@ app.get('/api/getLatLongFromAddress', async (req, res) => {
         res.status(500).send(error)
     }
 })
+
+
+//otp verification
+app.post('/api/send-otp', async (req, res) => {
+  try{
+    const phone = '9700812822';
+    const otp = Math.floor(1000 + Math.random() * 9000);
+    const response = await axios.post('https://www.fast2sms.com/dev/bulkV2', {
+      variables_values : `${otp}`,
+      route : "otp",
+      numbers: phone,
+      sender_id: 'FSTSMS',
+
+      message: `Your OTP is ${otp}. Do not share this OTP with anyone - ARESUNO`
+
+    }, {
+      headers: {
+        'authorization': process.env.FAST2SMS_API,
+      },
+    });
+
+    console.log(response.data);
+
+    res.json({ success: true, message: 'OTP sent successfully!' });
+
+
+  }
+  catch(error){
+    console.error('Error sending OTP:', error);
+    res.status(500).json({ success: false, message: 'Failed to send OTP.' });  }
+})
+
+
+app.post('/api/forgetPassword-otp', async (req, res) => {
+  try{
+    const phone = '9700812822';
+    const otp = Math.floor(1000 + Math.random() * 9000);
+    let user = await User.findOne({ phone });
+    if(!user){
+        user = await Vendor.findOne({ phone });
+    }
+
+    if (!user) {
+        return res.status(400).json({ message: 'Phone number donot exist' });
+    }
+
+    user.otp = {
+      value : otp,
+      expires: Date.now() + (5 * 60 * 1000),
+    };
+    await user.save();
+
+    const response = await axios.post('https://www.fast2sms.com/dev/bulkV2', {
+      variables_values : `${otp}`,
+      route : "otp",
+      numbers: phone,
+      sender_id: 'FSTSMS',
+
+      message: `Your OTP is ${otp}. Do not share this OTP with anyone - ARESUNO`
+
+    }, {
+      headers: {
+        'authorization': process.env.FAST2SMS_API,
+      },
+    });
+
+    console.log(response.data);
+
+    res.json({ success: true, message: 'OTP sent successfully!' });
+  }
+  catch(error){
+    console.error('Error sending OTP:', error);
+    res.status(500).json({ success: false, message: 'Failed to send OTP.' });  }
+  })
+
+  app.post('/api/forgetPassword-verify-otp', async (req, res) => {
+    try{
+      const { phone, otp } = req.body;
+      let user = await User.findOne({ phone });
+      if(!user){
+          user = await Vendor.findOne({ phone });
+      }
+
+      if (!user) {
+          return res.status(400).json({ message: 'Phone number donot exist' });
+      }
+
+      console.log(user.otp)
+      console.log(otp)
+
+      if (user.otp.value != otp) {
+        return res.status(400).json({ message: 'Invalid OTP' });
+      }
+
+      if (user.otp.expires < Date.now()) {
+        return res.status(400).json({ message: 'OTP expired' });
+      }
+
+      res.json({ success: true, message: 'OTP verified successfully!' });
+
+    }
+    catch(error){
+      console.error('Error sending OTP:', error);
+      res.status(500).json({ success: false, message: 'Failed to send OTP.' });  }
+    
+  })
+
+
+  app.patch('/api/reset-password', async (req, res) => {
+    try{
+      const { phone, password } = req.body;
+      let user = await User.findOne({ phone });
+      if(!user){
+          user = await Vendor.findOne({ phone });
+      }
+
+      if (!user) {
+          return res.status(400).json({ message: 'Phone number donot exist' });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      user.password = hashedPassword;
+      await user.save();
+
+      res.json({ success: true, message: 'Password reset successfully!' });
+
+    }
+    catch(error){
+      console.error('Error sending OTP:', error);
+      res.status(500).json({ success: false, message: 'Failed to change password.' });  }
+  })
+
 
 
 

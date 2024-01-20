@@ -127,6 +127,10 @@ const BusinessSchema = new mongoose.Schema({
     callLeads : [{
         type : mongoose.Schema.Types.ObjectId,
         ref : 'CallLead',
+    }],
+    enquiries : [{
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'Enquiry',
     }]
 }, {
     timestamps: true

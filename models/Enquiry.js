@@ -11,15 +11,14 @@ const EnquirySchema = new mongoose.Schema({
     },
     message : {
         type : String,
-        required : true
     },
     business : {
         type : mongoose.Schema.Types.ObjectId,
         ref : 'Business',
-        required : true
     },
     category : {
-        type : String,
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'Category',
     },
     location : {
         type : String
@@ -27,6 +26,7 @@ const EnquirySchema = new mongoose.Schema({
     status : {
         type : String,
         enum : ['pending', 'resolved', 'rejected'],
+        default : 'pending'
     }
 }, {
     timestamps : true
