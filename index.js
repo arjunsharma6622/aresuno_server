@@ -254,6 +254,7 @@ app.get('/api/getLatLongFromAddress', async (req, res) => {
 app.post('/api/send-otp', async (req, res) => {
   try{
     const phone = req.body.phone;
+    // sd
     const otp = Math.floor(1000 + Math.random() * 9000);
     const response = await axios.post('https://www.fast2sms.com/dev/bulkV2', {
       variables_values : `${otp}`,
