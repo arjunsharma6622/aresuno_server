@@ -253,7 +253,7 @@ app.get('/api/getLatLongFromAddress', async (req, res) => {
 //otp verification
 app.post('/api/send-otp', async (req, res) => {
   try{
-    const phone = '9700812822';
+    const phone = req.body.phone;
     const otp = Math.floor(1000 + Math.random() * 9000);
     const response = await axios.post('https://www.fast2sms.com/dev/bulkV2', {
       variables_values : `${otp}`,
