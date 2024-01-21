@@ -13,8 +13,8 @@ const VendorSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        unique: true,
-        index : true,
+        // unique: true,
+        // index : true,
         required: true
     },
     password: {

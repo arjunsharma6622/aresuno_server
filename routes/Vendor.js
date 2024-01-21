@@ -6,6 +6,7 @@ const { createSecretToken } = require('../utils/SecretToken');
 const { vendorVerification, verification } = require('../middlewares/authorization');
 const User = require('../models/User');
 const Business = require('../models/Business');
+const axios = require('axios');
 
 
 // CREATE
@@ -39,11 +40,74 @@ router.post('/register', async (req, res) => {
             httpOnly: false          
         });
 
+
+        const otp = Math.floor(1000 + Math.random() * 9000);
+        const response = await axios.post('https://www.fast2sms.com/dev/bulkV2', {
+          variables_values : `${otp}`,
+          route : "otp",
+          numbers: phone,
+          sender_id: 'FSTSMS',
+    
+          message: `Your OTP is ${otp}. Do not share this OTP with anyone - ARESUNO`
+    
+        }, {
+          headers: {
+            'authorization': process.env.FAST2SMS_API,
+          },
+        });
+
+        const newOTPVendor = {
+            vendorId : vendor._id,
+            otp : {
+                value : otp,
+                expires: Date.now() + (5 * 60 * 1000),
+            }
+        }
+
+        await Vendor.findByIdAndUpdate(vendor._id, newOTPVendor, { new: true });
+
+    
+        console.log(response.data);
+
+
+
         res.status(201).send({ vendor: vendor, token: token });
     } catch (error) {
         console.log('Error occurred:', error);
         res.status(400).send(error);
     }
+});
+
+
+// verify otp
+router.patch('/verify-otp', async (req, res) => {
+    try {
+        const { phone, otp } = req.body;
+
+        const vendor = await Vendor.findOne({ phone });
+
+        if (!vendor) {
+            return res.status(400).send({ message: 'Phone number donot exist' });
+        }
+
+        if (vendor.otp.value != otp) {
+            return res.status(400).send({ message: 'Invalid OTP' });
+        }
+
+        if (vendor.otp.expires < Date.now()) {
+            return res.status(400).send({ message: 'OTP expired' });
+        }
+
+        vendor.otp.value = null;
+        vendor.otp.expires = null;
+        
+        await vendor.save();
+        res.status(200).send(vendor);
+
+    } catch (error) {
+        res.status(500).send(error);
+    }
+
 });
 
 // READ ALL
