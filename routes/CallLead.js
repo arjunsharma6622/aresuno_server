@@ -2,21 +2,83 @@ const express = require('express');
 const router = express.Router();
 const CallLead = require('../models/CallLead');
 const Business = require('../models/Business');
+const axios = require('axios');
 
 
 router.post('/create', async (req, res) => {
     try {
-        const newCallLead = new CallLead(req.body);
-        await newCallLead.save();
-        const business = await Business.findById(req.body.business);
-        business.callLeads.push(newCallLead._id);
-        await business.save();
-        res.status(200).send(newCallLead);
+      const newCallLead = new CallLead(req.body);
+      await newCallLead.save();
+  
+      const business = await Business.findById(req.body.business);
+      business.callLeads.push(newCallLead._id);
+      await business.save();
+  
+      const phone = newCallLead.phone;
+  
+      const otp = Math.floor(1000 + Math.random() * 9000);
+      const response = await axios.post(
+        'https://www.fast2sms.com/dev/bulkV2',
+        {
+          variables_values: `${otp}`,
+          route: 'otp',
+          numbers: phone,
+          sender_id: 'FSTSMS',
+          message: `Your OTP is ${otp}. Do not share this OTP with anyone - ARESUNO`,
+        },
+        {
+          headers: {
+            authorization: process.env.FAST2SMS_API,
+          },
+        }
+      );
+  
+      const newOTPCallLead = {
+        ...newCallLead._doc,
+        otp: {
+          value: otp,
+          expires: new Date(Date.now() + 10 * 60 * 1000),
+        },
+      };
+  
+      await CallLead.findByIdAndUpdate(newCallLead._id, newOTPCallLead);
+  
+      res.status(200).send(newOTPCallLead);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send(err);
+    }
+  });
+  
+
+//verify and update call lead
+router.patch('/verify-otp', async (req, res) => {
+    try {
+        const callLead = await CallLead.findById(req.body._id);
+        if(callLead.otp.value !== req.body.otp) {
+            return res.status(400).send('Invalid OTP');
+        }
+        if(callLead.otp.expires < Date.now()) {
+            return res.status(400).send('OTP expired');
+        }
+
+        callLead.otp.value = null;
+        callLead.otp.expires = null;
+
+        callLead.verified = true;
+
+        await callLead.save();
+        res.status(200).send(callLead);
     }
     catch(err) {
         res.status(500).send(err);
     }
+
 })
+
+
+
+
 
 //get all call leads
 router.get('/', async (req, res) => {

@@ -14,6 +14,19 @@ const CallLeadSchema = new mongoose.Schema({
         ref : 'Business',
         required : true
     },
+    verified : {
+        type : Boolean,
+        required : true,
+        default : false
+    },
+    otp : {
+        value : {
+            type: String
+        },
+        expires : {
+            type: Date
+        },
+    },
 }, {
     timestamps : true
 })
