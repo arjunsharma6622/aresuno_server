@@ -74,51 +74,111 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
-// Unified Login Endpoint
-app.post('/api/login', async (req, res, next) => {
-    try {
-        const { email, password } = req.body;
+// // Unified Login Endpoint
+// app.post('/api/login', async (req, res, next) => {
+//     try {
+//         const { email, password } = req.body;
 
-        let user = await User.findOne({ email });
-        let userType = "user"
-        if (!user) {
-            user = await Vendor.findOne({ email });
-            userType = "vendor"
-        }
+//         const isEmail = /\S+@\S+\.\S+/.test(email);
 
-        if (!user) {
-            return res.status(400).json({ message: 'Incorrect email or password' });
-        }
 
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(400).json({ message: 'Incorrect email or password' });
-        }
+//         let user = await User.findOne({ email });
+//         let userType = "user"
+//         if (!user) {
+//             user = await Vendor.findOne({ email });
+//             userType = "vendor"
+//         }
 
-        const token = createSecretToken(user._id);
-        console.log(token);
-        // res.cookie('token', token, {
-        //     maxAge: 24 * 60 * 60 * 1000, // 1 day
-        //     sameSite: 'none',
-        //     secure: true,
-        //     withCredentials: true,
-        //     httpOnly: false    
-        // });
+//         if (!user) {
+//             return res.status(400).json({ message: 'Incorrect email or password' });
+//         }
+
+//         const isPasswordValid = await bcrypt.compare(password, user.password);
+//         if (!isPasswordValid) {
+//             return res.status(400).json({ message: 'Incorrect email or password' });
+//         }
+
+//         const token = createSecretToken(user._id);
+//         console.log(token);
+//         // res.cookie('token', token, {
+//         //     maxAge: 24 * 60 * 60 * 1000, // 1 day
+//         //     sameSite: 'none',
+//         //     secure: true,
+//         //     withCredentials: true,
+//         //     httpOnly: false    
+//         // });
 
         
 
-        let message;
-        if (user instanceof User) {
-            message = 'User logged in successfully';
-        } else if (user instanceof Vendor) {
-            message = 'Vendor logged in successfully';
-        }
+//         let message;
+//         if (user instanceof User) {
+//             message = 'User logged in successfully';
+//         } else if (user instanceof Vendor) {
+//             message = 'Vendor logged in successfully';
+//         }
 
-        res.status(200).json({ message: message, success: true, userType: userType, user: user, token: token });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
+//         res.status(200).json({ message: message, success: true, userType: userType, user: user, token: token });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Internal server error' });
+//     }
+// });
+
+app.post('/api/login', async (req, res, next) => {
+  try {
+      const { email, password } = req.body;
+
+      // Determine if the provided input is an email or phone number
+      const isEmail = /\S+@\S+\.\S+/.test(email);
+      const isPhone = /^\d{10}$/.test(email);
+
+      let user;
+
+      if (isEmail) {
+          user = await User.findOne({ email });
+      } else if (isPhone) {
+          user = await User.findOne({ phone: email });
+      }
+
+      let userType = "user";
+
+      if (!user) {
+          // If user is not found in User collection, check Vendor collection
+          if (isEmail) {
+              user = await Vendor.findOne({ email });
+          } else if (isPhone) {
+              user = await Vendor.findOne({ phone: email });
+          }
+
+          userType = "vendor";
+      }
+
+      if (!user) {
+          return res.status(400).json({ message: 'Incorrect email or phone number or password' });
+      }
+
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+
+      if (!isPasswordValid) {
+          return res.status(400).json({ message: 'Incorrect email or phone number or password' });
+      }
+
+      const token = createSecretToken(user._id);
+      console.log(token);
+
+      let message;
+
+      if (user instanceof User) {
+          message = 'User logged in successfully';
+      } else if (user instanceof Vendor) {
+          message = 'Vendor logged in successfully';
+      }
+
+      res.status(200).json({ message: message, success: true, userType: userType, user: user, token: token });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
 
@@ -396,6 +456,7 @@ app.use('/api/category-title', require('./routes/CategoryTitle'));
 app.use('/api/rating', require('./routes/Rating'))
 app.use('/api/enquiry', require('./routes/Enquiry'))
 app.use('/api/call-lead', require('./routes/CallLead'))
+app.use('/api/blog', require('./routes/Blog'))
 
 
 

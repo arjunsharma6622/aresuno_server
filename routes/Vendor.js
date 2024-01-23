@@ -137,6 +137,7 @@ router.get("/businesses", verification, async (req, res, next) => {
             .populate({path : "category", select : "name"})
             .populate("callLeads")
             .populate("category")
+            .populate("enquiries")
 
 
         const allCallLeads = businesses.flatMap(business => business.callLeads)
