@@ -8,7 +8,7 @@ const BusinessSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['service', 'manufacturing'],
+        enum: ['service', 'doctor', 'manufacturing'],
         required: true
     },
     profileImg: {

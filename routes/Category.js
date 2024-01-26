@@ -50,4 +50,25 @@ router.delete("/:id", async (req, res) => {
   }
 })
 
+
+router.get('/update-business-type', async (req, res) => {
+  try {
+    // Fetch all categories
+    const categories = await Category.find();
+
+    // Iterate through categories and update businessType
+    for (const category of categories) {
+      if (!category.businessType) {
+        // If businessType doesn't exist, update it to 'service'
+        await Category.findByIdAndUpdate(category._id, { businessType: 'service' });
+      }
+    }
+
+    res.status(200).json({ message: 'BusinessType updated successfully.' });
+  } catch (error) {
+    console.error('Error updating businessType:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 module.exports = router;
