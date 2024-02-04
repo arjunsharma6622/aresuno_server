@@ -38,6 +38,9 @@ const userSchema = new mongoose.Schema({
         expires : {
             type: Date
         },
+        createdAt : {
+            type: Date
+        }
     },
 
 }, {

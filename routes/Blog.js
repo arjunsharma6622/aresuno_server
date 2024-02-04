@@ -1,11 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const Blog = require('../models/Blog');
+const cloudinary = require('cloudinary').v2;
 
 
 router.get('/', async (req, res) => {
     try {
         const blog = await Blog.find({});
+        res.send(blog).status(200);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+})
+
+router.get('/:id', async (req, res) => {
+    try {
+        const blog = await Blog.findById(req.params.id);
         res.send(blog).status(200);
     } catch (error) {
         res.status(500).send(error);
@@ -59,18 +69,40 @@ router.delete('/:id', async (req, res) => {
         // Use the findByIdAndDelete method to delete the business record
         const deletedBlog = await Blog.findByIdAndDelete(id);
 
+        
+        function extractPublicIdFromUrl(url) {
+            // Regular expression to match everything before the last slash and dot
+            const regex = /\/([^/.]+)(?:\.[^/]+)?$/;
+            const match = url.match(regex);
+          
+            // Check if a match is found
+            if (match && match[1]) {
+              // Extracted part before the last slash and dot is in match[1]
+              return match[1];
+            } else {
+              // Return null if no match is found
+              return null;
+            }
+          }
+
+          console.log(extractPublicIdFromUrl(deletedBlog.image));
+
+        cloudinary.uploader.destroy(`aresuno/blogs/${extractPublicIdFromUrl(deletedBlog.image)}`).then(result => console.log(result)).catch(error => console.log(error));
+
         // Check if the business record with the given id exists
         if (!deletedBlog) {
             return res.status(404).send("Blog not found");
         }
 
         console.log(deletedBlog);
-        res.status(200).send("Blog deleted successfully");
+        res.status(200).send({ message: "Blog deleted successfully", deletedBlog });
     } catch (error) {
         console.error(error);
-        res.status(500).send("Internal Server Error");
+        res.status(500).send(error);
     }
 })
+
+
 
 
 module.exports = router

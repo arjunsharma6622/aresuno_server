@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const { createSecretToken } = require('../utils/SecretToken');
 const { verification } = require('../middlewares/authorization');
 const Vendor = require('../models/Vendor');
+const axios = require('axios');
 
 // CREATE
 router.post('/register', async (req, res) => {
@@ -12,7 +13,6 @@ router.post('/register', async (req, res) => {
         const { name, email, password, phone, gender, place, image } = req.body;
 
 
-                // Check if the email already exists in either Vendor or User collections
                 const vendorExists = await Vendor.findOne({ email: email });
                 const userExists = await User.findOne({ email: email });
         
@@ -40,6 +40,31 @@ router.post('/register', async (req, res) => {
             withCredentials: true,
             httpOnly: false            
         });
+
+
+        const otp = Math.floor(1000 + Math.random() * 9000);
+        const response = await axios.post('https://www.fast2sms.com/dev/bulkV2', {
+          variables_values : `${otp}`,
+          route : "otp",
+          numbers: phone,
+          sender_id: 'FSTSMS',
+    
+          message: `Your OTP is ${otp}. Do not share this OTP with anyone - ARESUNO`
+    
+        }, {
+          headers: {
+            'authorization': process.env.FAST2SMS_API,
+          },
+        });
+
+        const newOTPUser = {
+            otp : {
+                value : otp,
+                expires: Date.now() + (5 * 60 * 1000),
+            }
+        }
+
+        await User.findByIdAndUpdate(user._id, newOTPUser, { new: true });
         
 
         res.status(201).send({user : user, token : token});
@@ -47,6 +72,38 @@ router.post('/register', async (req, res) => {
         res.status(400).send(error);
     }
 })
+
+
+// verify otp
+router.patch('/verify-otp', async (req, res) => {
+    try {
+        const { phone, otp } = req.body;
+
+        const user = await User.findOne({ phone });
+
+        if (!user) {
+            return res.status(400).send({ message: 'Phone number donot exist' });
+        }
+
+        if (user.otp.value != otp) {
+            return res.status(400).send({ message: 'Invalid OTP' });
+        }
+
+        if (user.otp.expires < Date.now()) {
+            return res.status(400).send({ message: 'OTP expired' });
+        }
+
+        user.otp.value = null;
+        user.otp.expires = null;
+        
+        await user.save();
+        res.status(200).send(user);
+
+    } catch (error) {
+        res.status(500).send(error);
+    }
+
+});
 
 // router.post('/login', async (req, res, next) => {
 //     try {
