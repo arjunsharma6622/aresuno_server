@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Blog = require('../models/Blog');
+const Category = require('../models/Category');
 const cloudinary = require('cloudinary').v2;
 
 
@@ -13,9 +14,37 @@ router.get('/', async (req, res) => {
     }
 })
 
-router.get('/:id', async (req, res) => {
+
+
+//get blogs by category
+router.get('/category/:categoryName', async (req, res) => {
+    try{
+        const formattedCategoryName = req.params.categoryName.split('-').join(' ').toLowerCase();
+        console.log(formattedCategoryName);
+        const category = await Category.findOne({
+            name: new RegExp(`^${formattedCategoryName}$`, 'i')
+        });
+        console.log(category);
+        const blog = await Blog.find({category: category._id});
+        res.send(blog).status(200);
+    }catch(error){
+        res.status(500).send(error);
+    }
+    
+})
+
+router.get('/category/:categoryName/:id', async (req, res) => {
     try {
-        const blog = await Blog.findById(req.params.id);
+        const formattedCategoryName = req.params.categoryName.split('-').join(' ').toLowerCase();
+        console.log(formattedCategoryName);
+        const category = await Category.findOne({
+            name: new RegExp(`^${formattedCategoryName}$`, 'i')
+        });
+        if(!category){
+            return res.status(404).send("Category not found");
+        }
+        console.log(category);
+        const blog = await Blog.findOne({category: category._id, _id: req.params.id});
         res.send(blog).status(200);
     } catch (error) {
         res.status(500).send(error);
@@ -54,10 +83,14 @@ router.put('/:id', async (req, res) => {
         }
 
         console.log(updatedBlog);
-        res.status(200).send("Blog updated successfully");
+        res.status(200).send({
+            success: true,
+            message: "Blog updated successfully",
+            data: updatedBlog
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).send("Internal Server Error");
+        res.status(500).send(error);
     }
 });
 
@@ -69,7 +102,7 @@ router.delete('/:id', async (req, res) => {
         // Use the findByIdAndDelete method to delete the business record
         const deletedBlog = await Blog.findByIdAndDelete(id);
 
-        
+
         function extractPublicIdFromUrl(url) {
             // Regular expression to match everything before the last slash and dot
             const regex = /\/([^/.]+)(?:\.[^/]+)?$/;
