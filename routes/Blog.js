@@ -14,6 +14,15 @@ router.get('/', async (req, res) => {
     }
 })
 
+router.get('/:id', async (req, res) => {
+    try {
+        const blog = await Blog.findById(req.params.id);
+        res.send(blog).status(200);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+})
+
 
 
 //get blogs by category
