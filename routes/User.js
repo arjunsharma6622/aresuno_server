@@ -3,21 +3,23 @@ const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const { createSecretToken } = require('../utils/SecretToken');
-const { verification } = require('../middlewares/authorization');
+const { verification, validateRole } = require('../middlewares/authorization');
 const Vendor = require('../models/Vendor');
 const axios = require('axios');
+const Business = require('../models/Business');
 
 // CREATE
 router.post('/register', async (req, res) => {
     try {
-        const { name, email, password, phone, gender, place, image } = req.body;
+        const { name, email, password, phone, gender, place, image, role } = req.body;
 
 
-                const vendorExists = await Vendor.findOne({ email: email });
-                const userExists = await User.findOne({ email: email });
+                // const vendorExists = await Vendor.findOne({ email: email });
+                const userExistsWithEmail = await User.findOne({ email: email });
+                const userExistsWithPhone = await User.findOne({ phone: phone });
         
-                if (vendorExists || userExists) {
-                    return res.status(400).send({ message: 'Email already in use for registration.' });
+                if (userExistsWithEmail || userExistsWithPhone) {
+                    return res.status(400).send({ message: 'Email or Phone number already in use for registration.' });
                 }
 
 
@@ -25,7 +27,7 @@ router.post('/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
 
-        const user = new User({ name, email, password: hashedPassword, phone, gender, place, image });
+        const user = new User({ name, email, password: hashedPassword, phone, gender, place, image, role });
 
         await user.save();
 
@@ -105,38 +107,62 @@ router.patch('/verify-otp', async (req, res) => {
 
 });
 
-// router.post('/login', async (req, res, next) => {
-//     try {
-//         const { email, password } = req.body;
-//         const user = await User.findOne({ email });
-//         if (!user) {
-//             return res.status(400).json({ message: 'Incorrect email or password' });
-//         }
-//         const isPasswordValid = await bcrypt.compare(password, user.password);
-//         if (!isPasswordValid) {
-//             return res.status(400).json({ message: 'Incorrect email or password' });
-//         }
-//         const token = createSecretToken(user._id);
-//         console.log(token);
-//         res.cookie("token", token, {
-//             httpOnly: false,
-//             maxAge: 24 * 60 * 60 * 1000, // 1 day
-//             sameSite: 'none',
-//             secure: true
-//         });
-//         res.status(200).json({ message: "User logged in successfully", success: true });
-//         next()
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ message: 'Internal server error' });
-//     }
-// });
+
+
+
+router.post('/login', async (req, res, next) => {
+    try {
+        const { email, password } = req.body;
+  
+        // Determine if the provided input is an email or phone number
+        const isEmail = /\S+@\S+\.\S+/.test(email);
+        const isPhone = /^\d{10}$/.test(email);
+  
+        let user;
+  
+        if (isEmail) {
+            user = await User.findOne({ email });
+        } else if (isPhone) {
+            user = await User.findOne({ phone: email });
+        }
+  
+        if (!user) {
+            return res.status(400).json({ message: 'Incorrect email or phone number or password' });
+        }
+  
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+  
+        if (!isPasswordValid) {
+            return res.status(400).json({ message: 'Incorrect email or phone number or password' });
+        }
+  
+        const token = createSecretToken(user._id);
+        console.log(token);
+  
+        res.status(200).json({ message: 'Logged in successfully', success: true, user: user, token: token });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+
+
 
 // READ ALL
-router.get('/all-users', async (req, res) => {
+router.get('/all-users', verification, validateRole(['admin']), async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await User.find({ role: 'user' });
         res.send(users);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+
+// READ ALL
+router.get('/all-vendors', verification, validateRole(['admin']), async (req, res) => {
+    try {
+        const vendors = await User.find({ role: 'vendor' });
+        res.send(vendors);
     } catch (error) {
         res.status(500).send(error);
     }
@@ -191,8 +217,12 @@ router.patch('/', verification, async (req, res, next) => {
 });
 
 
+
+
+
+
 //DELETE
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', verification, validateRole(['admin', 'user', 'vendor']), async (req, res, next) => {
     try {
         const user = await User.findByIdAndDelete(req.params.id);
         if (!user) {
@@ -203,5 +233,10 @@ router.delete('/:id', async (req, res, next) => {
         res.status(500).send(error);
     }
 });
+
+
+
+
+
 
 module.exports = router;

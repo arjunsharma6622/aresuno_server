@@ -67,3 +67,28 @@ module.exports.isTokenExpired = (req, res, next) => {
         return res.status(401).json({ message: "Unauthorized" });
     }
 };
+
+module.exports.validateRole = (requiredRole) => {
+    return (req, res, next) => {
+        if (req.user && req.user.role === requiredRole) {
+            // User has the required role, proceed to the next middleware
+            next();
+        } else {
+            // User does not have the required role, return an error response
+            res.status(403).send({ error: 'Insufficient privileges.' });
+        }
+    };
+};
+
+module.exports.validateRole = (requiredRoles) => {
+    return (req, res, next) => {
+        
+    
+    if(req.user && requiredRoles.includes(req.user.role)){
+        next();
+    }
+    else{
+        res.status(403).send({ error: 'Insufficient privileges.' });
+    }
+}
+}

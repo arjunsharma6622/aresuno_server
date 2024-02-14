@@ -5,6 +5,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    role: {
+        type: String,
+        enum: ['user', 'vendor', 'admin'],
+        default: 'user'
+    },
     email: {
         type: String,
         required: true,
@@ -31,6 +36,18 @@ const userSchema = new mongoose.Schema({
     image : {
         type: String
     },
+    businesses: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Business',
+    }],
+    enquiries : [{
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'Enquiry',
+    }],
+    ratings: [{
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'Rating'
+    }],
     otp : {
         value : {
             type: String

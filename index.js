@@ -140,19 +140,6 @@ app.post('/api/login', async (req, res, next) => {
           user = await User.findOne({ phone: email });
       }
 
-      let userType = "user";
-
-      if (!user) {
-          // If user is not found in User collection, check Vendor collection
-          if (isEmail) {
-              user = await Vendor.findOne({ email });
-          } else if (isPhone) {
-              user = await Vendor.findOne({ phone: email });
-          }
-
-          userType = "vendor";
-      }
-
       if (!user) {
           return res.status(400).json({ message: 'Incorrect email or phone number or password' });
       }
@@ -166,15 +153,7 @@ app.post('/api/login', async (req, res, next) => {
       const token = createSecretToken(user._id);
       console.log(token);
 
-      let message;
-
-      if (user instanceof User) {
-          message = 'User logged in successfully';
-      } else if (user instanceof Vendor) {
-          message = 'Vendor logged in successfully';
-      }
-
-      res.status(200).json({ message: message, success: true, userType: userType, user: user, token: token });
+      res.status(200).json({ message: 'Logged in successfully', success: true, userType: user.role, user: user, token: token });
   } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Internal server error' });

@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const Business = require("../models/Business");
-const Vendor = require("../models/Vendor");
-const { verification } = require("../middlewares/authorization");
+const { verification, validateRole } = require("../middlewares/authorization");
 const Category = require("../models/Category");
 const mongoose = require("mongoose");
 const { ObjectId } = require("mongodb");
+const User = require("../models/User");
 
-router.post("/register", async (req, res) => {
+router.post("/register", verification, validateRole(['admin', 'vendor']), async (req, res) => {
     try {
       const newBusiness = new Business(req.body);
       const categoryID = req.body.category;
@@ -28,7 +28,7 @@ router.post("/register", async (req, res) => {
         await category.save();
       // updating vendor with the newly registered businesses
       const vendorId = newBusiness.vendorId;
-      await Vendor.updateOne(
+      await User.updateOne(
         { _id: vendorId },
         { $push: { businesses: newBusiness._id } }
       );
@@ -39,44 +39,6 @@ router.post("/register", async (req, res) => {
       res.status(400).send(error.message);
     }
   });
-
-
-  // router.get("/getNearbyBusinesses", async (req, res) => {
-    // router.get("/getNearbyBusinesses", async (req, res) => {
-    //   try {
-    //     const lat = req.query.lat;  // Access lat using req.query.lat
-    //     const long = req.query.long;  // Access long using req.query.long
-
-
-    //     // Ensure that lat and long are provided in the query parameters
-    //     if (!lat || !long) {
-    //       return res.status(400).send({ message: "Latitude and longitude are required." });
-    //     }
-    
-    //     console.log("Fetching businesses near coordinates:", lat, long);
-    
-    //     const businesses = await Business.aggregate([
-    //       {
-    //         $geoNear: {
-    //           near: {
-    //             type: "Point",
-    //             coordinates: [parseFloat(long), parseFloat(lat)]
-    //           },
-    //           distanceField: "distance",  // Adds a field 'distance' to each document representing the distance
-    //           maxDistance: 1000000,  // 100 kilometers; adjust as per your requirement
-    //           spherical: true  // Indicates the use of spherical geometry (for Earth-like sphere)
-    //         }
-    //       }
-    //     ]);
-    
-    //     res.status(200).send(businesses);  // Sending a 200 OK response
-    //   } catch (error) {
-    //     console.error("Error fetching nearby businesses:", error);
-    //     res.status(500).send({ message: "Internal Server Error" });  // Sending a 500 Internal Server Error response
-    //   }
-    // });
-    
-  // })
 
 
   router.get("/getNearbyBusinesses", async (req, res) => {
@@ -178,7 +140,7 @@ router.get("/getBusinessByName/:businessName", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", verification, validateRole(['admin', 'vendor']), async (req, res) => {
   try {
     const id = req.params.id;
     const updates = req.body; // Assuming the updates are sent in the request body
@@ -229,16 +191,16 @@ router.patch("/:id/rating", verification, async (req, res, next) => {
 });
 
 // DELETE
-router.delete("/:id", verification, async (req, res, next) => {
+router.delete("/:id", verification, validateRole(['admin', 'vendor']), async (req, res, next) => {
   try {
     console.log("The business id to be deleted is" + req.params.id);
     const business = await Business.findByIdAndDelete(req.params.id);
 
-    await Vendor.findOneAndUpdate(
+    await User.findOneAndUpdate(
       { _id: req.user._id },
       { $pull: { businesses: new ObjectId(req.params.id) } }
     );
-    const updatedVendor = await Vendor.findById(req.user._id);
+    const updatedVendor = await User.findById(req.user._id);
 
     const categoryId = business.category;
 

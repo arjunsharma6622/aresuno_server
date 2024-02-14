@@ -1,6 +1,7 @@
 const express = require('express'); 
 const router = express.Router();
 const Banner = require('../models/Banner');
+const { verification, validateRole } = require('../middlewares/authorization');
 
 
 
@@ -13,7 +14,7 @@ router.get('/', async (req, res) => {
     }
 })
 
-router.post('/add', async (req, res) => {
+router.post('/add', verification, validateRole(['admin']), async (req, res) => {
     try {
         const newBanner = new Banner(req.body);
         console.log(newBanner);
@@ -26,7 +27,7 @@ router.post('/add', async (req, res) => {
 });
 
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', verification, validateRole(['admin']), async (req, res) => {
     try{
         const banner = await Banner.findByIdAndUpdate(req.params.id, req.body);
         console.log(banner)
@@ -37,7 +38,7 @@ router.put('/:id', async (req, res) => {
     }
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verification, validateRole(['admin']), async (req, res) => {
     try{
         const banner = await Banner.findByIdAndDelete(req.params.id);
         res.status(200).send(banner);

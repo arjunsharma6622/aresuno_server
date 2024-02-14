@@ -35,7 +35,12 @@ const CategorySchema = new mongoose.Schema({
     type : String,
     enum : ['service', 'doctor', 'manufacturing'],
     required : true
-  }
+  },
+  keywords : [
+    {
+      type : String
+    }
+  ]
 }, {
   timestamps: true,
 });

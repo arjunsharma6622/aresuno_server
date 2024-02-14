@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Category = require('../models/Category');
+const { verification, validateRole } = require('../middlewares/authorization');
 const cloudinary = require('cloudinary').v2;
 
 router.get("/", async (req, res) => {
@@ -13,7 +14,7 @@ router.get("/", async (req, res) => {
   }
 })
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", verification, validateRole(['admin']), async (req, res) => {
   try{
     const updatedCategory = await Category.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.status(200).send(updatedCategory);
@@ -25,7 +26,7 @@ router.put("/:id", async (req, res) => {
 
 
 // POST route to create one or more categories
-router.post('/create', async (req, res) => {
+router.post('/create', verification, validateRole(['admin']), async (req, res) => {
   try {
     const categoriesData = req.body; // Assuming req.body contains an array of category objects
 
@@ -40,7 +41,7 @@ router.post('/create', async (req, res) => {
 });
 
 // delete category
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", verification, validateRole(['admin']), async (req, res) => {
   try{
     const deletedCategory = await Category.findByIdAndDelete(req.params.id);
     res.status(200).send(deletedCategory);
