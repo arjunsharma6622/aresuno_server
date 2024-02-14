@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const { verification, validateRole } = require("../middlewares/authorization");
 const City = require("../models/City");
 
 //get all cities
@@ -26,7 +27,7 @@ router.get("/:cityName", async (req, res) => {
 })
 
 //add city data
-router.post("/add", async (req, res) => {
+router.post("/add", verification, validateRole(["admin"]), async (req, res) => {
     try{
         const newCity = new City(req.body);
         await newCity.save();
@@ -37,7 +38,7 @@ router.post("/add", async (req, res) => {
 })
 
 //update city data
-router.put("/:id", async (req, res) => {
+router.put("/:id", verification, validateRole(["admin"]), async (req, res) => {
     try{
         const city = await City.findByIdAndUpdate(req.params.id, req.body, {new: true});
         if(!city){
@@ -51,7 +52,7 @@ router.put("/:id", async (req, res) => {
 
 
 //delete city data
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", verification, validateRole(["admin"]), async (req, res) => {
     try{
         const city = await City.findByIdAndDelete(req.params.id);
         if(!city){
