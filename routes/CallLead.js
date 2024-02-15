@@ -49,6 +49,24 @@ router.post('/create', async (req, res) => {
       res.status(500).send(err);
     }
   });
+
+
+router.post('/createLoggedInLead', async (req, res) => {
+  try{
+    const newCallLead = new CallLead(req.body);
+    newCallLead.verified = true;
+    await newCallLead.save();
+
+    const business = await Business.findById(req.body.business);
+    business.callLeads.push(newCallLead._id);
+    await business.save();
+
+    res.status(200).send(newCallLead);
+  }
+  catch(err) {
+    res.status(500).send(err);
+  }
+})
   
 
 //verify and update call lead
