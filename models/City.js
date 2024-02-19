@@ -4,7 +4,8 @@ const CitySchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        index : true
     },
     coordinates : {
         type : [Number], // [longitude, latitude]

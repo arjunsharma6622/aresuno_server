@@ -6,6 +6,7 @@ const Category = require("../models/Category");
 const mongoose = require("mongoose");
 const { ObjectId } = require("mongodb");
 const User = require("../models/User");
+const City = require("../models/City");
 
 router.post("/register", verification, validateRole(['admin', 'vendor']), async (req, res) => {
     try {
@@ -43,9 +44,23 @@ router.post("/register", verification, validateRole(['admin', 'vendor']), async 
 
   router.get("/getNearbyBusinesses", async (req, res) => {
     try {
-      const lat = req.query.lat;  // Access lat using req.query.lat
-      const long = req.query.long;  // Access long using req.query.long
-      const categoryId = req.query.categoryId;  // Access categoryId using req.query.categoryId
+      let lat  // Access lat using req.query.lat
+      let long  // Access long using req.query.long
+      const categoryName = req.query.categoryName;  // Access categoryId using req.query.categoryId
+      const categoryId = await Category.findOne({ name: new RegExp(categoryName, "i") }).select("_id");
+      const city = req.query.city;
+
+      if (req.query.city) {
+        const city = await City.findOne({name : new RegExp(req.query.city, "i")});
+        if (!city) {
+          return res.status(404).send({ message: "City not found." });
+        }
+        lat = city.coordinates[1];
+        long = city.coordinates[0];
+      }else if(req.query.lat && req.query.long) {
+        lat = req.query.lat;
+        long = req.query.long;
+      }
   
       // Ensure that lat and long are provided in the query parameters
       if (!lat || !long) {
@@ -128,7 +143,7 @@ router.get("/getBusinessByName/:businessName", async (req, res) => {
     console.log(formattedBusinessName)
     const business = await Business.findOne({
       name: { $regex: new RegExp(`^${formattedBusinessName}$`, 'i') },
-    });
+    }).populate("posts").populate("ratings").populate({path : "category", select : "name"});
 
     if (!business) {
       return res.status(404).send("Business not found");
