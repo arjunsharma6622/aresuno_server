@@ -11,6 +11,7 @@ router.get("/:businessId", async (req, res, next) => {
 
     try {
         const ratings = await Rating.find({ businessId: businessId });
+
         
         const updatedRatings = await Promise.all(ratings.map(async (rating) => {
             let user;
@@ -36,9 +37,12 @@ router.get("/:businessId", async (req, res, next) => {
         }));
         
         const filteredRatings = updatedRatings.filter(rating => rating !== null);
+
+        const avgRating = filteredRatings.reduce((acc, item) => acc + (item.rating || 0), 0) / filteredRatings.length;
+        const totalRatings = filteredRatings.length;
         
         console.log(filteredRatings);
-        res.status(200).send(filteredRatings);
+        res.status(200).send({filteredRatings, avgRating : avgRating.toFixed(1), totalRatings});
     } catch (err) {
         console.error("Error fetching ratings:", err);
         res.status(500).send(err);

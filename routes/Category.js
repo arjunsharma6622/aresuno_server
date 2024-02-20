@@ -14,6 +14,21 @@ router.get("/", async (req, res) => {
   }
 })
 
+// get category by name
+router.get("/:categoryName", async (req, res) => {
+  try{
+    const formattedCategoryName = req.params.categoryName;
+    const category = await Category.findOne({name: new RegExp(`^${formattedCategoryName}$`, 'i')});
+    if(!category){
+      return res.status(404).send("Category not found");
+    }
+    res.status(200).send(category);
+  }
+  catch(err){
+    res.status(500).send(err);
+  }
+})
+
 router.put("/:id", verification, validateRole(['admin']), async (req, res) => {
   try{
     const updatedCategory = await Category.findByIdAndUpdate(req.params.id, req.body, { new: true });
