@@ -96,7 +96,7 @@ router.post("/register", verification, validateRole(['admin', 'vendor']), async 
   
       const businesses = await Business.aggregate(aggregationPipeline);
   
-      res.status(200).send(businesses);  // Sending a 200 OK response
+      res.status(200).send({businesses, coordinates : [long, lat]});  // Sending a 200 OK response
     } catch (error) {
       console.error("Error fetching nearby businesses:", error);
       res.status(500).send({ message: "Internal Server Error" });  // Sending a 500 Internal Server Error response
