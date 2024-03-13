@@ -74,55 +74,6 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
-// // Unified Login Endpoint
-// app.post('/api/login', async (req, res, next) => {
-//     try {
-//         const { email, password } = req.body;
-
-//         const isEmail = /\S+@\S+\.\S+/.test(email);
-
-
-//         let user = await User.findOne({ email });
-//         let userType = "user"
-//         if (!user) {
-//             user = await Vendor.findOne({ email });
-//             userType = "vendor"
-//         }
-
-//         if (!user) {
-//             return res.status(400).json({ message: 'Incorrect email or password' });
-//         }
-
-//         const isPasswordValid = await bcrypt.compare(password, user.password);
-//         if (!isPasswordValid) {
-//             return res.status(400).json({ message: 'Incorrect email or password' });
-//         }
-
-//         const token = createSecretToken(user._id);
-//         console.log(token);
-//         // res.cookie('token', token, {
-//         //     maxAge: 24 * 60 * 60 * 1000, // 1 day
-//         //     sameSite: 'none',
-//         //     secure: true,
-//         //     withCredentials: true,
-//         //     httpOnly: false    
-//         // });
-
-        
-
-//         let message;
-//         if (user instanceof User) {
-//             message = 'User logged in successfully';
-//         } else if (user instanceof Vendor) {
-//             message = 'Vendor logged in successfully';
-//         }
-
-//         res.status(200).json({ message: message, success: true, userType: userType, user: user, token: token });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ message: 'Internal server error' });
-//     }
-// });
 
 app.post('/api/login', async (req, res, next) => {
   try {
