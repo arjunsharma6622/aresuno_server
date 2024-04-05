@@ -17,7 +17,7 @@ router.post("/create", async (req, res) => {
     const phone = newCallLead.phone;
 
     const otp = Math.floor(1000 + Math.random() * 9000);
-    const response = await axios.post(
+    await axios.post(
       "https://www.fast2sms.com/dev/bulkV2",
       {
         variables_values: `${otp}`,

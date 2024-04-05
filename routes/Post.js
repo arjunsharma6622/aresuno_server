@@ -1,9 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Post = require("../models/Post");
-const { verification } = require("../middlewares/authorization");
 const Business = require("../models/Business");
-const cloudinary = require("cloudinary").v2;
 const logger = require("../utils/logger");
 
 router.post("/create", async (req, res, next) => {

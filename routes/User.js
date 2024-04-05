@@ -4,9 +4,7 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const { createSecretToken } = require("../utils/SecretToken");
 const { verification, validateRole } = require("../middlewares/authorization");
-const Vendor = require("../models/Vendor");
 const axios = require("axios");
-const Business = require("../models/Business");
 const logger = require("../utils/logger");
 
 // CREATE
@@ -50,7 +48,7 @@ router.post("/register", async (req, res) => {
     });
 
     const otp = Math.floor(1000 + Math.random() * 9000);
-    const response = await axios.post(
+    await axios.post(
       "https://www.fast2sms.com/dev/bulkV2",
       {
         variables_values: `${otp}`,

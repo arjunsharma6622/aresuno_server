@@ -3,7 +3,6 @@ const User = require("../models/User");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const Vendor = require("../models/Vendor");
-const logger = require("../utils/logger");
 
 module.exports.verification = (req, res, next) => {
   const token = req.headers.authorization.split(" ")[1];

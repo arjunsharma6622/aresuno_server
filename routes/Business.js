@@ -47,7 +47,6 @@ router.get("/getNearbyBusinesses", async (req, res) => {
     const categoryId = await Category.findOne({
       name: new RegExp(categoryName, "i"),
     }).select("_id");
-    const city = req.query.city;
 
     if (req.query.city) {
       const city = await City.findOne({
@@ -222,7 +221,6 @@ router.delete(
         { _id: req.user._id },
         { $pull: { businesses: new ObjectId(req.params.id) } },
       );
-      const updatedVendor = await User.findById(req.user._id);
       const categoryId = business.category;
       const category = await Category.findById(categoryId);
       category.businesses.pull(req.params.id);
