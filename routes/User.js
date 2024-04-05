@@ -19,11 +19,9 @@ router.post("/register", async (req, res) => {
     const userExistsWithPhone = await User.findOne({ phone: phone });
 
     if (userExistsWithEmail || userExistsWithPhone) {
-      return res
-        .status(400)
-        .send({
-          message: "Email or Phone number already in use for registration.",
-        });
+      return res.status(400).send({
+        message: "Email or Phone number already in use for registration.",
+      });
     }
 
     const saltRounds = 10;
@@ -148,14 +146,12 @@ router.post("/login", async (req, res, next) => {
     const token = createSecretToken(user._id);
     console.log(token);
 
-    res
-      .status(200)
-      .json({
-        message: "Logged in successfully",
-        success: true,
-        user: user,
-        token: token,
-      });
+    res.status(200).json({
+      message: "Logged in successfully",
+      success: true,
+      user: user,
+      token: token,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });

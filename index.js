@@ -110,15 +110,13 @@ app.post("/api/login", async (req, res, next) => {
     const token = createSecretToken(user._id);
     console.log(token);
 
-    res
-      .status(200)
-      .json({
-        message: "Logged in successfully",
-        success: true,
-        userType: user.role,
-        user: user,
-        token: token,
-      });
+    res.status(200).json({
+      message: "Logged in successfully",
+      success: true,
+      userType: user.role,
+      user: user,
+      token: token,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -199,12 +197,10 @@ app.get("/api/getLocationFromLatLong", async (req, res) => {
       console.log(formattedLocation);
       res.json(formattedLocation);
     } else {
-      res
-        .status(404)
-        .json({
-          message:
-            "No location details found for the provided latitude and longitude.",
-        });
+      res.status(404).json({
+        message:
+          "No location details found for the provided latitude and longitude.",
+      });
     }
   } catch (error) {
     console.error("Error fetching location details:", error);
