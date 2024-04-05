@@ -7,6 +7,7 @@ const { verification, validateRole } = require("../middlewares/authorization");
 const Vendor = require("../models/Vendor");
 const axios = require("axios");
 const Business = require("../models/Business");
+const logger = require("../utils/logger");
 
 // CREATE
 router.post("/register", async (req, res) => {
@@ -39,10 +40,7 @@ router.post("/register", async (req, res) => {
     });
 
     await user.save();
-
     const token = createSecretToken(user._id);
-    console.log(token);
-
     res.cookie("token", token, {
       maxAge: 24 * 60 * 60 * 1000, // 1 day
       sameSite: "none",
@@ -80,6 +78,7 @@ router.post("/register", async (req, res) => {
 
     res.status(201).send({ user: user, token: token });
   } catch (error) {
+    logger.error(error);
     res.status(400).send(error);
   }
 });
@@ -109,6 +108,7 @@ router.patch("/verify-otp", async (req, res) => {
     await user.save();
     res.status(200).send(user);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -122,7 +122,6 @@ router.post("/login", async (req, res, next) => {
     const isPhone = /^\d{10}$/.test(email);
 
     let user;
-
     if (isEmail) {
       user = await User.findOne({ email });
     } else if (isPhone) {
@@ -136,7 +135,6 @@ router.post("/login", async (req, res, next) => {
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-
     if (!isPasswordValid) {
       return res
         .status(400)
@@ -144,8 +142,6 @@ router.post("/login", async (req, res, next) => {
     }
 
     const token = createSecretToken(user._id);
-    console.log(token);
-
     res.status(200).json({
       message: "Logged in successfully",
       success: true,
@@ -153,7 +149,7 @@ router.post("/login", async (req, res, next) => {
       token: token,
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -168,6 +164,7 @@ router.get(
       const users = await User.find({ role: "user" });
       res.send(users);
     } catch (error) {
+      logger.error(error);
       res.status(500).send(error);
     }
   },
@@ -183,6 +180,7 @@ router.get(
       const vendors = await User.find({ role: "vendor" });
       res.send(vendors);
     } catch (error) {
+      logger.error(error);
       res.status(500).send(error);
     }
   },
@@ -197,6 +195,7 @@ router.get("/", verification, async (req, res, next) => {
     }
     res.send(user);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -233,6 +232,7 @@ router.patch("/", verification, async (req, res, next) => {
     await user.save();
     res.send(user);
   } catch (error) {
+    logger.error(error);
     res.status(400).send(error);
   }
 });
@@ -250,6 +250,7 @@ router.delete(
       }
       res.status(200).send({ message: "User deleted successfully" });
     } catch (error) {
+      logger.error(error);
       res.status(500).send(error);
     }
   },

@@ -3,12 +3,14 @@ const router = express.Router();
 const Blog = require("../models/Blog");
 const Category = require("../models/Category");
 const cloudinary = require("cloudinary").v2;
+const logger = require("../utils/logger");
 
 router.get("/", async (req, res) => {
   try {
     const blog = await Blog.find({});
     res.send(blog).status(200);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -18,6 +20,7 @@ router.get("/:id", async (req, res) => {
     const blog = await Blog.findById(req.params.id);
     res.send(blog).status(200);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -29,14 +32,13 @@ router.get("/category/:categoryName", async (req, res) => {
       .split("-")
       .join(" ")
       .toLowerCase();
-    console.log(formattedCategoryName);
     const category = await Category.findOne({
       name: new RegExp(`^${formattedCategoryName}$`, "i"),
     });
-    console.log(category);
     const blog = await Blog.find({ category: category._id });
     res.send(blog).status(200);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -47,20 +49,19 @@ router.get("/category/:categoryName/:id", async (req, res) => {
       .split("-")
       .join(" ")
       .toLowerCase();
-    console.log(formattedCategoryName);
     const category = await Category.findOne({
       name: new RegExp(`^${formattedCategoryName}$`, "i"),
     });
     if (!category) {
       return res.status(404).send("Category not found");
     }
-    console.log(category);
     const blog = await Blog.findOne({
       category: category._id,
       _id: req.params.id,
     });
     res.send(blog).status(200);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -69,11 +70,10 @@ router.get("/category/:categoryName/:id", async (req, res) => {
 router.post("/create", async (req, res) => {
   try {
     const newBlog = new Blog(req.body);
-    console.log(newBlog);
     await newBlog.save();
     res.status(201).send(newBlog);
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     res.status(400).send(error);
   }
 });
@@ -82,9 +82,6 @@ router.put("/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const updates = req.body; // Assuming the updates are sent in the request body
-
-    console.log(req.body);
-
     // Use the findByIdAndUpdate method to update the business record
     const updatedBlog = await Blog.findByIdAndUpdate(id, updates, {
       new: true,
@@ -95,14 +92,13 @@ router.put("/:id", async (req, res) => {
       return res.status(404).send("Blog not found");
     }
 
-    console.log(updatedBlog);
     res.status(200).send({
       success: true,
       message: "Blog updated successfully",
       data: updatedBlog,
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -114,7 +110,7 @@ router.delete("/:id", async (req, res) => {
     // Use the findByIdAndDelete method to delete the business record
     const deletedBlog = await Blog.findByIdAndDelete(id);
 
-    function extractPublicIdFromUrl(url) {
+    const extractPublicIdFromUrl = (url) => {
       // Regular expression to match everything before the last slash and dot
       const regex = /\/([^/.]+)(?:\.[^/]+)?$/;
       const match = url.match(regex);
@@ -127,9 +123,7 @@ router.delete("/:id", async (req, res) => {
         // Return null if no match is found
         return null;
       }
-    }
-
-    console.log(extractPublicIdFromUrl(deletedBlog.image));
+    };
 
     cloudinary.uploader
       .destroy(`aresuno/blogs/${extractPublicIdFromUrl(deletedBlog.image)}`)
@@ -141,10 +135,9 @@ router.delete("/:id", async (req, res) => {
       return res.status(404).send("Blog not found");
     }
 
-    console.log(deletedBlog);
     res.status(200).send({ message: "Blog deleted successfully", deletedBlog });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).send(error);
   }
 });

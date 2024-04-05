@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Banner = require("../models/Banner");
 const { verification, validateRole } = require("../middlewares/authorization");
+const logger = require("../utils/logger");
 
 router.get("/", async (req, res) => {
   try {
@@ -15,11 +16,10 @@ router.get("/", async (req, res) => {
 router.post("/add", verification, validateRole(["admin"]), async (req, res) => {
   try {
     const newBanner = new Banner(req.body);
-    console.log(newBanner);
     await newBanner.save();
     res.status(201).send(newBanner);
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     res.status(400).send(error);
   }
 });
@@ -27,9 +27,9 @@ router.post("/add", verification, validateRole(["admin"]), async (req, res) => {
 router.put("/:id", verification, validateRole(["admin"]), async (req, res) => {
   try {
     const banner = await Banner.findByIdAndUpdate(req.params.id, req.body);
-    console.log(banner);
     res.status(200).send(banner);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -43,6 +43,7 @@ router.delete(
       const banner = await Banner.findByIdAndDelete(req.params.id);
       res.status(200).send(banner);
     } catch (error) {
+      logger.error(error);
       res.status(500).send(error);
     }
   },

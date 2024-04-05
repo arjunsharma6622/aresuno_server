@@ -4,15 +4,12 @@ const Post = require("../models/Post");
 const { verification } = require("../middlewares/authorization");
 const Business = require("../models/Business");
 const cloudinary = require("cloudinary").v2;
+const logger = require("../utils/logger");
 
 router.post("/create", async (req, res, next) => {
   const { businessId, image, description } = req.body;
 
   try {
-    // const cloudinaryResponse = await cloudinary.uploader.upload(image, {
-    //     folder: "aresuno/posts"
-    // })
-    // const post = new Post({ businessId, description, image: cloudinaryResponse.secure_url });
     const post = new Post({ businessId, description, image });
     await post.save();
 
@@ -22,6 +19,7 @@ router.post("/create", async (req, res, next) => {
 
     res.status(201).send(post);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -31,6 +29,7 @@ router.get("/all-posts", async (req, res, next) => {
     const posts = await Post.find();
     res.status(200).send(posts);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -40,6 +39,7 @@ router.get("/all-posts/:id", async (req, res, next) => {
     const posts = await Post.find({ businessId: req.params.id });
     res.status(200).send(posts);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -49,6 +49,7 @@ router.get("/:id", async (req, res, next) => {
     const post = await Post.findById(req.params.id);
     res.status(200).send(post);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -75,6 +76,7 @@ router.patch("/:id", async (req, res, next) => {
 
     res.send(post);
   } catch (error) {
+    logger.error(error);
     res.status(400).send(error);
   }
 });
@@ -88,6 +90,7 @@ router.delete("/:id", async (req, res, next) => {
 
     res.status(200).send("Post Deleted Successfully");
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
