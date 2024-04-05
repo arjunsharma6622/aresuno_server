@@ -29,5 +29,8 @@
     "nodemon": "^3.0.1",
     "otp-generator": "^4.0.1",
     "sendotp": "^1.2.9"
+  },
+  "devDependencies": {
+    "prettier": "3.2.5"
   }
 }
