@@ -3,12 +3,10 @@ const User = require("../models/User");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const Vendor = require("../models/Vendor");
+const logger = require("../utils/logger");
 
 module.exports.verification = (req, res, next) => {
   const token = req.headers.authorization.split(" ")[1];
-  console.log("Token: in auth middlware", token);
-  console.log("req.baseUrl:", req.baseUrl);
-  console.log(req.headers.authorization);
   if (!token) {
     return res.status(401).json({ message: "Unauthorized" });
   }
@@ -17,7 +15,7 @@ module.exports.verification = (req, res, next) => {
     if (err) {
       return res.status(401).json({ message: "Unauthorized" });
     } else {
-      var user;
+      let user;
 
       if (
         req.baseUrl.includes("business") ||
@@ -41,7 +39,6 @@ module.exports.verification = (req, res, next) => {
         console.log("exit the vendor check if block");
       }
       if (!user) {
-        console.log(req.baseUrl);
         return res.status(404).json({ message: "User/Vendor not found" });
       }
       req.user = user; // Set the user object in the request for use in other routes/controllers
