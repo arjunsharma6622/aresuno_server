@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Category = require("../models/Category");
 const { verification, validateRole } = require("../middlewares/authorization");
-const cloudinary = require("cloudinary").v2;
 const logger = require("../utils/logger");
 
 router.get("/", async (req, res) => {

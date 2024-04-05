@@ -3,11 +3,7 @@ const router = express.Router();
 const Vendor = require("../models/Vendor");
 const bcrypt = require("bcrypt");
 const { createSecretToken } = require("../utils/SecretToken");
-const {
-  vendorVerification,
-  verification,
-  validateRole,
-} = require("../middlewares/authorization");
+const { verification, validateRole } = require("../middlewares/authorization");
 const User = require("../models/User");
 const Business = require("../models/Business");
 const axios = require("axios");
@@ -43,7 +39,6 @@ router.post("/register", async (req, res) => {
     });
 
     await vendor.save();
-
     const token = createSecretToken(vendor._id);
 
     res.cookie("token", token, {
@@ -81,8 +76,6 @@ router.post("/register", async (req, res) => {
     };
 
     await Vendor.findByIdAndUpdate(vendor._id, newOTPVendor, { new: true });
-
-    console.log(response.data);
 
     res.status(201).send({ vendor: vendor, token: token });
   } catch (error) {
@@ -152,7 +145,6 @@ router.get(
         .populate("category")
         .populate("enquiries");
 
-      const allCallLeads = businesses.flatMap((business) => business.callLeads);
       res.status(201).send(businesses);
     } catch (error) {
       logger.error(error);

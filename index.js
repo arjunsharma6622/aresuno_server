@@ -11,9 +11,7 @@ const bcrypt = require("bcrypt");
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 const { verification } = require("./middlewares/authorization");
-const jwt = require("jsonwebtoken");
 const axios = require("axios");
-const { json } = require("body-parser");
 const logger = require("./utils/logger");
 
 logger.info("Starting app.");
@@ -26,7 +24,6 @@ app.use(express.json());
 
 // Configure Multer to handle file uploads
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
 // Initialize Cloudinary (make sure to set your cloudinary configuration)
 cloudinary.config({
@@ -330,8 +327,7 @@ app.post("/api/forgetPassword-otp", async (req, res) => {
       expires: Date.now() + 5 * 60 * 1000,
     };
     await user.save();
-
-    const response = await axios.post(
+    await axios.post(
       "https://www.fast2sms.com/dev/bulkV2",
       {
         variables_values: `${otp}`,
