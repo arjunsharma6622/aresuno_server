@@ -1,16 +1,19 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const CategoryTitleSchema = new mongoose.Schema({
+const CategoryTitleSchema = new mongoose.Schema(
+  {
     title: {
-        type: String,
-        required: true
-    }, 
+      type: String,
+      required: true,
+    },
     showOnHome: {
-        type: Boolean,
-        default: false
-    }
-}, {
-        timestamps: true
-    })
+      type: Boolean,
+      default: false,
+    },
+  },
+  {
+    timestamps: true,
+  },
+);
 
-module.exports = mongoose.model('CategoryTitle', CategoryTitleSchema)
+module.exports = mongoose.model("CategoryTitle", CategoryTitleSchema);
