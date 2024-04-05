@@ -1,77 +1,78 @@
-const express = require('express')
-const router = express.Router()
-const Rating = require('../models/Rating')
-const Business = require('../models/Business')
-const User = require('../models/User')
-const Vendor = require('../models/Vendor')
-const { verification } = require('../middlewares/authorization')
+const express = require("express");
+const router = express.Router();
+const Rating = require("../models/Rating");
+const Business = require("../models/Business");
+const User = require("../models/User");
+const Vendor = require("../models/Vendor");
+const { verification } = require("../middlewares/authorization");
 
 router.get("/:businessId", async (req, res, next) => {
-    const businessId = req.params.businessId;
+  const businessId = req.params.businessId;
 
-    try {
-        const ratings = await Rating.find({ businessId: businessId });
+  try {
+    const ratings = await Rating.find({ businessId: businessId });
 
-        
-        const updatedRatings = await Promise.all(ratings.map(async (rating) => {
-            let user;
-            
-            try {
-                user = await User.findById(rating.userId);
-                
-                if (!user) {
-                    user = await Vendor.findById(rating.userId);
-                }
-                
-                return {
-                    ...rating._doc,
-                    user: {
-                        name: user.name,
-                        image: user.image
-                    }
-                };
-            } catch (userError) {
-                console.error("Error fetching user:", userError);
-                return null;
-            }
-        }));
-        
-        const filteredRatings = updatedRatings.filter(rating => rating !== null);
+    const updatedRatings = await Promise.all(
+      ratings.map(async (rating) => {
+        let user;
 
-        const avgRating = filteredRatings.reduce((acc, item) => acc + (item.rating || 0), 0) / filteredRatings.length;
-        const totalRatings = filteredRatings.length;
-        
-        console.log(filteredRatings);
-        res.status(200).send({filteredRatings, avgRating : avgRating.toFixed(1), totalRatings});
-    } catch (err) {
-        console.error("Error fetching ratings:", err);
-        res.status(500).send(err);
-    }
+        try {
+          user = await User.findById(rating.userId);
+
+          if (!user) {
+            user = await Vendor.findById(rating.userId);
+          }
+
+          return {
+            ...rating._doc,
+            user: {
+              name: user.name,
+              image: user.image,
+            },
+          };
+        } catch (userError) {
+          console.error("Error fetching user:", userError);
+          return null;
+        }
+      }),
+    );
+
+    const filteredRatings = updatedRatings.filter((rating) => rating !== null);
+
+    const avgRating =
+      filteredRatings.reduce((acc, item) => acc + (item.rating || 0), 0) /
+      filteredRatings.length;
+    const totalRatings = filteredRatings.length;
+
+    console.log(filteredRatings);
+    res
+      .status(200)
+      .send({ filteredRatings, avgRating: avgRating.toFixed(1), totalRatings });
+  } catch (err) {
+    console.error("Error fetching ratings:", err);
+    res.status(500).send(err);
+  }
 });
 
+router.post("/create/:businessId", verification, async (req, res, next) => {
+  try {
+    const businessId = req.params.businessId;
+    const userId = req.user._id;
+    const rating = new Rating({
+      userId: userId,
+      businessId: businessId,
+      rating: req.body.rating,
+      review: req.body.review,
+    });
+    await rating.save();
 
-router.post("/create/:businessId", verification ,async (req, res, next) => {
-    try{
-        const businessId = req.params.businessId;
-        const userId = req.user._id
-        const rating = new Rating({
-            userId: userId,
-            businessId: businessId,
-            rating: req.body.rating,
-            review: req.body.review
-        })
-        await rating.save();
-
-        const business = await Business.findById(businessId);
-        business.ratings.push(rating._id);
-        await business.save();
-        res.status(200).send(rating)
-    }
-    catch(err){
-        res.status(500).send(err)
-    }
-})
+    const business = await Business.findById(businessId);
+    business.ratings.push(rating._id);
+    await business.save();
+    res.status(200).send(rating);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
 
 module.exports = router;
-
-
