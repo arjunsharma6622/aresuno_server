@@ -3,6 +3,7 @@ const router = express.Router();
 const CallLead = require("../models/CallLead");
 const Business = require("../models/Business");
 const axios = require("axios");
+const logger = require("../utils/logger");
 
 router.post("/create", async (req, res) => {
   try {
@@ -41,10 +42,9 @@ router.post("/create", async (req, res) => {
     };
 
     await CallLead.findByIdAndUpdate(newCallLead._id, newOTPCallLead);
-
     res.status(200).send(newOTPCallLead);
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     res.status(500).send(err);
   }
 });
@@ -58,9 +58,9 @@ router.post("/createLoggedInLead", async (req, res) => {
     const business = await Business.findById(req.body.business);
     business.callLeads.push(newCallLead._id);
     await business.save();
-
     res.status(200).send(newCallLead);
   } catch (err) {
+    logger.error(err);
     res.status(500).send(err);
   }
 });
@@ -78,12 +78,11 @@ router.patch("/verify-otp", async (req, res) => {
 
     callLead.otp.value = null;
     callLead.otp.expires = null;
-
     callLead.verified = true;
-
     await callLead.save();
     res.status(200).send(callLead);
   } catch (err) {
+    logger.error(err);
     res.status(500).send(err);
   }
 });
@@ -94,6 +93,7 @@ router.get("/", async (req, res) => {
     const leads = await CallLead.find().populate("business");
     res.status(200).send(leads);
   } catch (err) {
+    logger.error(err);
     res.status(500).send(err);
   }
 });
@@ -104,6 +104,7 @@ router.get("/:id", async (req, res) => {
     const lead = await CallLead.findById(req.params.id);
     res.status(200).send(lead);
   } catch (err) {
+    logger.error(err);
     res.status(500).send(err);
   }
 });
@@ -114,6 +115,7 @@ router.delete("/:id", async (req, res) => {
     const lead = await CallLead.findByIdAndDelete(req.params.id);
     res.status(200).send(lead);
   } catch (err) {
+    logger.error(err);
     res.status(500).send(err);
   }
 });

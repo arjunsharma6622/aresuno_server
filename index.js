@@ -14,7 +14,9 @@ const { verification } = require("./middlewares/authorization");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const { json } = require("body-parser");
+const logger = require("./utils/logger");
 
+logger.info("Starting app.");
 dotenv.config();
 
 const db = process.env.DB_URL;
@@ -32,8 +34,6 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
-console.log("Cloudinary configuration:", cloudinary.config());
 
 const allowedOrigins = [
   "https://www.aresuno.com",
@@ -69,7 +69,7 @@ mongoose
 
 // Start server
 app.listen(port, () => {
-  console.log("Server started on port " + port);
+  logger.info("Server started on port " + port);
 });
 
 // Define routes
@@ -108,7 +108,6 @@ app.post("/api/login", async (req, res, next) => {
     }
 
     const token = createSecretToken(user._id);
-    console.log(token);
 
     res.status(200).json({
       message: "Logged in successfully",
@@ -118,7 +117,7 @@ app.post("/api/login", async (req, res, next) => {
       token: token,
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -194,7 +193,7 @@ app.get("/api/getLocationFromLatLong", async (req, res) => {
         isExact: 0, // You can set this value based on your requirements
       };
 
-      console.log(formattedLocation);
+      logger.info(formattedLocation);
       res.json(formattedLocation);
     } else {
       res.status(404).json({
@@ -203,14 +202,13 @@ app.get("/api/getLocationFromLatLong", async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error fetching location details:", error);
+    logger.error("Error fetching location details:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
 app.get("/api/autocomplete", async (req, res) => {
   const input = req.query.input; // Get the input query parameter from the request
-  console.log(input);
   const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&key=${googleMapKey}&types=(regions)`;
 
   try {
@@ -264,7 +262,7 @@ app.get("/api/autocomplete", async (req, res) => {
       res.status(404).send({ message: "No predictions found" });
     }
   } catch (error) {
-    console.error("Error fetching details:", error);
+    logger.error("Error fetching details:", error);
     res.status(500).send({ message: "Internal Server Error" });
   }
 });
@@ -307,11 +305,9 @@ app.post("/api/send-otp", async (req, res) => {
       },
     );
 
-    console.log(response.data);
-
     res.json({ success: true, message: "OTP sent successfully!" });
   } catch (error) {
-    console.error("Error sending OTP:", error);
+    logger.error("Error sending OTP:", error);
     res.status(500).json({ success: false, message: "Failed to send OTP." });
   }
 });
@@ -352,11 +348,9 @@ app.post("/api/forgetPassword-otp", async (req, res) => {
       },
     );
 
-    console.log(response.data);
-
     res.json({ success: true, message: "OTP sent successfully!" });
   } catch (error) {
-    console.error("Error sending OTP:", error);
+    logger.error("Error sending OTP:", error);
     res.status(500).json({ success: false, message: "Failed to send OTP." });
   }
 });
@@ -373,9 +367,6 @@ app.post("/api/forgetPassword-verify-otp", async (req, res) => {
       return res.status(400).json({ message: "Phone number donot exist" });
     }
 
-    console.log(user.otp);
-    console.log(otp);
-
     if (user.otp.value != otp) {
       return res.status(400).json({ message: "Invalid OTP" });
     }
@@ -386,7 +377,7 @@ app.post("/api/forgetPassword-verify-otp", async (req, res) => {
 
     res.json({ success: true, message: "OTP verified successfully!" });
   } catch (error) {
-    console.error("Error sending OTP:", error);
+    logger.error("Error sending OTP:", error);
     res.status(500).json({ success: false, message: "Failed to send OTP." });
   }
 });
@@ -410,7 +401,7 @@ app.patch("/api/reset-password", async (req, res) => {
 
     res.json({ success: true, message: "Password reset successfully!" });
   } catch (error) {
-    console.error("Error sending OTP:", error);
+    logger.error("Error sending OTP:", error);
     res
       .status(500)
       .json({ success: false, message: "Failed to change password." });

@@ -11,6 +11,7 @@ const {
 const User = require("../models/User");
 const Business = require("../models/Business");
 const axios = require("axios");
+const logger = require("../utils/logger");
 
 // CREATE
 router.post("/register", async (req, res) => {
@@ -44,7 +45,6 @@ router.post("/register", async (req, res) => {
     await vendor.save();
 
     const token = createSecretToken(vendor._id);
-    console.log(token);
 
     res.cookie("token", token, {
       maxAge: 24 * 60 * 60 * 1000, // 1 day
@@ -86,7 +86,7 @@ router.post("/register", async (req, res) => {
 
     res.status(201).send({ vendor: vendor, token: token });
   } catch (error) {
-    console.log("Error occurred:", error);
+    logger.error(error);
     res.status(400).send(error);
   }
 });
@@ -116,6 +116,7 @@ router.patch("/verify-otp", async (req, res) => {
     await vendor.save();
     res.status(200).send(vendor);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -126,6 +127,7 @@ router.get("/all-vendors", async (req, res) => {
     const vendors = await Vendor.find();
     res.send(vendors);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -151,10 +153,9 @@ router.get(
         .populate("enquiries");
 
       const allCallLeads = businesses.flatMap((business) => business.callLeads);
-      console.log(allCallLeads);
-
       res.status(201).send(businesses);
     } catch (error) {
+      logger.error(error);
       res.status(500).send(error);
     }
   },
@@ -207,11 +208,9 @@ router.get(
         name: month,
         Leads: leadsCountByMonth[month] || 0, // Default to 0 if there are no leads for the month
       }));
-
-      console.log(graphData);
-
       res.status(201).json(graphData);
     } catch (error) {
+      logger.error(error);
       res.status(500).send(error);
     }
   },
@@ -238,6 +237,7 @@ router.get("/businesses", verification, async (req, res, next) => {
 
     res.status(201).send(businesses);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -288,6 +288,7 @@ router.get("/", verification, async (req, res, next) => {
     }
     res.send(vendor);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -311,7 +312,6 @@ router.patch("/", verification, async (req, res, next) => {
     }
 
     if (req.body.password) {
-      console.log(req.body.password);
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
       vendor.password = hashedPassword;
     }
@@ -325,6 +325,7 @@ router.patch("/", verification, async (req, res, next) => {
     await vendor.save();
     res.send(vendor);
   } catch (error) {
+    logger.error(error);
     res.status(400).send(error);
   }
 });
@@ -338,6 +339,7 @@ router.delete("/:id", async (req, res, next) => {
     }
     res.status(200).send({ message: "Vendor deleted successfully" });
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });

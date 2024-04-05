@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const { verification, validateRole } = require("../middlewares/authorization");
 const City = require("../models/City");
+const logger = require("../utils/logger");
 
 //get all cities
 router.get("/", async (req, res) => {
@@ -8,6 +9,7 @@ router.get("/", async (req, res) => {
     const cities = await City.find({});
     res.send(cities).status(200);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -21,6 +23,7 @@ router.get("/:cityName", async (req, res) => {
     }
     res.send(city).status(200);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -32,6 +35,7 @@ router.post("/add", verification, validateRole(["admin"]), async (req, res) => {
     await newCity.save();
     res.status(201).send(newCity);
   } catch (error) {
+    logger.error(error);
     res.status(400).send(error);
   }
 });
@@ -47,6 +51,7 @@ router.put("/:id", verification, validateRole(["admin"]), async (req, res) => {
     }
     res.send(city).status(200);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -64,6 +69,7 @@ router.delete(
       }
       res.send(city).status(200);
     } catch (error) {
+      logger.error(error);
       res.status(500).send(error);
     }
   },

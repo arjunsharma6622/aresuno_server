@@ -5,6 +5,7 @@ const Business = require("../models/Business");
 const User = require("../models/User");
 const Vendor = require("../models/Vendor");
 const { verification } = require("../middlewares/authorization");
+const logger = require("../utils/logger");
 
 router.get("/:businessId", async (req, res, next) => {
   const businessId = req.params.businessId;
@@ -31,7 +32,7 @@ router.get("/:businessId", async (req, res, next) => {
             },
           };
         } catch (userError) {
-          console.error("Error fetching user:", userError);
+          logger.error("Error fetching user:", userError);
           return null;
         }
       }),
@@ -44,12 +45,11 @@ router.get("/:businessId", async (req, res, next) => {
       filteredRatings.length;
     const totalRatings = filteredRatings.length;
 
-    console.log(filteredRatings);
     res
       .status(200)
       .send({ filteredRatings, avgRating: avgRating.toFixed(1), totalRatings });
   } catch (err) {
-    console.error("Error fetching ratings:", err);
+    logger.error("Error fetching ratings:", err);
     res.status(500).send(err);
   }
 });
@@ -71,6 +71,7 @@ router.post("/create/:businessId", verification, async (req, res, next) => {
     await business.save();
     res.status(200).send(rating);
   } catch (err) {
+    logger.error(err);
     res.status(500).send(err);
   }
 });

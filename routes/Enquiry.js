@@ -2,6 +2,7 @@ const express = require("express");
 const Enquiry = require("../models/Enquiry");
 const Business = require("../models/Business");
 const router = express.Router();
+const logger = require("../utils/logger");
 
 router.post("/create", async (req, res) => {
   try {
@@ -14,6 +15,7 @@ router.post("/create", async (req, res) => {
     await newEnquiry.save();
     res.status(200).send(newEnquiry);
   } catch (err) {
+    logger.error(err);
     res.status(500).send(err);
   }
 });
@@ -25,6 +27,7 @@ router.get("/", async (req, res) => {
       .populate("business");
     res.status(200).send(enquiries);
   } catch (err) {
+    logger.error(err);
     res.status(500).send(err);
   }
 });
@@ -34,6 +37,7 @@ router.get("/:id", async (req, res) => {
     const enquiries = await Enquiry.findById(req.params.id);
     res.status(200).send(enquiries);
   } catch (err) {
+    logger.error(err);
     res.status(500).send(err);
   }
 });
@@ -47,6 +51,7 @@ router.patch("/:id", async (req, res) => {
     );
     res.status(200).send(updatedEnquiry);
   } catch (err) {
+    logger.error(err);
     res.status(500).send(err);
   }
 });
@@ -56,6 +61,7 @@ router.delete("/:id", async (req, res) => {
     const deletedEnquiry = await Enquiry.findByIdAndDelete(req.params.id);
     res.status(200).send(deletedEnquiry);
   } catch (err) {
+    logger.error(err);
     res.status(500).send(err);
   }
 });

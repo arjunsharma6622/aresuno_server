@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const { ObjectId } = require("mongodb");
 const User = require("../models/User");
 const City = require("../models/City");
+const logger = require("../utils/logger");
 
 router.post(
   "/register",
@@ -16,18 +17,11 @@ router.post(
     try {
       const newBusiness = new Business(req.body);
       const categoryID = req.body.category;
-
-      console.log(newBusiness);
       await newBusiness.save();
 
       // updating categories with the newly registered businesses
       const category = await Category.findById(categoryID);
-
-      console.log(category);
-
       category.businesses.push(newBusiness._id);
-
-      console.log(category);
 
       await category.save();
       // updating vendor with the newly registered businesses
@@ -39,7 +33,7 @@ router.post(
 
       res.status(201).send(newBusiness);
     } catch (error) {
-      console.log(error.message);
+      logger.error(error.message);
       res.status(400).send(error.message);
     }
   },
@@ -76,9 +70,6 @@ router.get("/getNearbyBusinesses", async (req, res) => {
         .send({ message: "Latitude and longitude are required." });
     }
 
-    console.log("Fetching businesses near coordinates:", lat, long);
-    console.log("Fetching businesses by category:", categoryId);
-
     let aggregationPipeline = [
       {
         $geoNear: {
@@ -103,10 +94,9 @@ router.get("/getNearbyBusinesses", async (req, res) => {
     }
 
     const businesses = await Business.aggregate(aggregationPipeline);
-
     res.status(200).send({ businesses, coordinates: [long, lat] }); // Sending a 200 OK response
   } catch (error) {
-    console.error("Error fetching nearby businesses:", error);
+    logger.error("Error fetching nearby businesses:", error);
     res.status(500).send({ message: "Internal Server Error" }); // Sending a 500 Internal Server Error response
   }
 });
@@ -116,6 +106,7 @@ router.get("/getAllBusinessesCount", async (req, res) => {
     const businessesCount = await Business.countDocuments({});
     res.send({ businessesCount }).status(200);
   } catch (error) {
+    logger.error("Error fetching nearby businesses:", error);
     res.status(500).send(error);
   }
 });
@@ -126,6 +117,7 @@ router.get("/", async (req, res) => {
     const businesses = await Business.find({}).populate("category");
     res.send(businesses);
   } catch (error) {
+    logger.error("Error fetching nearby businesses:", error);
     res.status(500).send(error);
   }
 });
@@ -142,6 +134,7 @@ router.get("/:id", async (req, res) => {
     }
     res.send(business);
   } catch (error) {
+    logger.error("Error fetching nearby businesses:", error);
     res.status(500).send(error);
   }
 });
@@ -149,7 +142,6 @@ router.get("/:id", async (req, res) => {
 router.get("/getBusinessByName/:businessName", async (req, res) => {
   try {
     const formattedBusinessName = req.params.businessName.replace(/-/g, " ");
-    console.log(formattedBusinessName);
     const business = await Business.findOne({
       name: { $regex: new RegExp(`^${formattedBusinessName}$`, "i") },
     })
@@ -163,6 +155,7 @@ router.get("/getBusinessByName/:businessName", async (req, res) => {
 
     res.send(business);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -176,8 +169,6 @@ router.put(
       const id = req.params.id;
       const updates = req.body; // Assuming the updates are sent in the request body
 
-      console.log(req.body);
-
       // Use the findByIdAndUpdate method to update the business record
       const updatedBusiness = await Business.findByIdAndUpdate(id, updates, {
         new: true,
@@ -188,10 +179,9 @@ router.put(
         return res.status(404).send("Business not found");
       }
 
-      console.log(updatedBusiness);
       res.status(200).send("Business updated successfully");
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       res.status(500).send("Internal Server Error");
     }
   },
@@ -205,8 +195,6 @@ router.patch("/:id/rating", verification, async (req, res, next) => {
     review,
   };
 
-  console.log(ratingReview);
-
   try {
     const business = await Business.findById(req.params.id);
     if (!business) {
@@ -214,10 +202,9 @@ router.patch("/:id/rating", verification, async (req, res, next) => {
     }
     business.ratingsReviews.push(ratingReview);
     await business.save();
-    console.log("check the push one");
-
     res.send(business);
   } catch (error) {
+    logger.error(error);
     res.status(400).json({ message: "error in rating and review", error });
   }
 });
@@ -229,7 +216,6 @@ router.delete(
   validateRole(["admin", "vendor"]),
   async (req, res, next) => {
     try {
-      console.log("The business id to be deleted is" + req.params.id);
       const business = await Business.findByIdAndDelete(req.params.id);
 
       await User.findOneAndUpdate(
@@ -237,20 +223,17 @@ router.delete(
         { $pull: { businesses: new ObjectId(req.params.id) } },
       );
       const updatedVendor = await User.findById(req.user._id);
-
       const categoryId = business.category;
-
       const category = await Category.findById(categoryId);
       category.businesses.pull(req.params.id);
       await category.save();
-
-      console.log("The updated Venodr is : " + updatedVendor);
 
       if (!business) {
         return res.status(404).send("Business not found");
       }
       res.send("Business deleted");
     } catch (error) {
+      logger.error(error);
       res.status(500).send(error);
     }
   },
@@ -264,7 +247,7 @@ router.get("/getbusinessesbycategory/:categoryId", async (req, res) => {
     );
     res.status(202).send(businesses);
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -335,6 +318,7 @@ router.patch("/update-modeofpayment-icon/:id", async (req, res) => {
     await business.save();
     res.status(200).send(business);
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });

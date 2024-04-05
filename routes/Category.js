@@ -3,12 +3,14 @@ const router = express.Router();
 const Category = require("../models/Category");
 const { verification, validateRole } = require("../middlewares/authorization");
 const cloudinary = require("cloudinary").v2;
+const logger = require("../utils/logger");
 
 router.get("/", async (req, res) => {
   try {
     const categories = await Category.find();
     res.status(200).send(categories);
   } catch (err) {
+    logger.error(err);
     res.status(500).send(err);
   }
 });
@@ -25,6 +27,7 @@ router.get("/:categoryName", async (req, res) => {
     }
     res.status(200).send(category);
   } catch (err) {
+    logger.error(err);
     res.status(500).send(err);
   }
 });
@@ -38,6 +41,7 @@ router.put("/:id", verification, validateRole(["admin"]), async (req, res) => {
     );
     res.status(200).send(updatedCategory);
   } catch (err) {
+    logger.error(err);
     res.status(500).send(err);
   }
 });
@@ -50,13 +54,11 @@ router.post(
   async (req, res) => {
     try {
       const categoriesData = req.body; // Assuming req.body contains an array of category objects
-
       // Create multiple categories at once using insertMany
       const createdCategories = await Category.insertMany(categoriesData);
-
       res.status(201).json(createdCategories); // Return the created categories
     } catch (error) {
-      console.error("Error creating categories:", error);
+      logger.error(error);
       res.status(500).json({ error: "Failed to create categories" });
     }
   },
@@ -72,6 +74,7 @@ router.delete(
       const deletedCategory = await Category.findByIdAndDelete(req.params.id);
       res.status(200).send(deletedCategory);
     } catch (err) {
+      logger.error(err);
       res.status(500).send(err);
     }
   },
@@ -94,7 +97,7 @@ router.get("/update-business-type", async (req, res) => {
 
     res.status(200).json({ message: "BusinessType updated successfully." });
   } catch (error) {
-    console.error("Error updating businessType:", error);
+    logger.error("Error updating businessType:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
