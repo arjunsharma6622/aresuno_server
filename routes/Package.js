@@ -14,3 +14,25 @@ router.get("/getpackages", async (req, res) => {
   }
 });
 
+// update package and its properties
+router.post(
+  "/update/:packageid",
+  verification,
+  validateRole(["admin"]),
+  async (req, res) => {
+    try {
+      console.log(req.body._id);
+      const updatePackage = await Package.findOneAndUpdate(
+        {
+          _id: req.body._id,
+        },
+        req.body,
+      );
+      res.status(200).send(updatePackage);
+    } catch (error) {
+      logger.error(error);
+      res.status(400).send(error);
+    }
+  },
+);
+
