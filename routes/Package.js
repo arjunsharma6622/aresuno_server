@@ -36,3 +36,21 @@ router.post(
   },
 );
 
+// post router to create new packages
+router.post(
+  "/create",
+  verification,
+  validateRole(["admin"]),
+  async (req, res) => {
+    try {
+      const createdPackages = await Package.insertMany(req.body);
+      console.log(createdPackages);
+      res.status(201).json(createdPackages);
+    } catch (error) {
+      logger.error(error);
+      res.status(500).json({ error: "Failed to create categories" });
+    }
+  },
+);
+
+module.exports = router;
