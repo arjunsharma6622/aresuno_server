@@ -44,7 +44,6 @@ router.post(
   async (req, res) => {
     try {
       const createdPackages = await Package.insertMany(req.body);
-      console.log(createdPackages);
       res.status(201).json(createdPackages);
     } catch (error) {
       logger.error(error);
