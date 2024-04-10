@@ -6,6 +6,12 @@ const PackageSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    category: {
+      type: String,
+      required: true,
+      enum: ["service", "doctor", "manufacturer"],
+      default: "service",
+    },
   },
   {
     timestamps: true,
