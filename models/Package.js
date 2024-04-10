@@ -5,18 +5,22 @@ const PackageSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      default: "Basic plan",
     },
     price: {
       type: Number,
       required: true,
+      default: 0,
     },
     prevPrice: {
       type: Number,
       required: true,
+      default: 0,
     },
     desc: {
       type: String,
       required: true,
+      default: "Our basic plan",
     },
     category: {
       type: String,
