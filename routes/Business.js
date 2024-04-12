@@ -48,6 +48,10 @@ router.get("/getNearbyBusinesses", async (req, res) => {
       name: new RegExp(categoryName, "i"),
     }).select("_id");
 
+    if (!categoryId) {
+      return res.status(404).send({ message: "Category not found." });
+    }
+
     if (req.query.city) {
       const city = await City.findOne({
         name: new RegExp(req.query.city, "i"),
