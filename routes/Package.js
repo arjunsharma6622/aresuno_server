@@ -16,12 +16,11 @@ router.get("/getpackages", async (req, res) => {
 
 // update package and its properties
 router.post(
-  "/update/:packageid",
+  "/update",
   verification,
   validateRole(["admin"]),
   async (req, res) => {
     try {
-      console.log(req.body._id);
       const updatePackage = await Package.findOneAndUpdate(
         {
           _id: req.body._id,
@@ -44,7 +43,6 @@ router.post(
   async (req, res) => {
     try {
       const createdPackages = await Package.insertMany(req.body);
-      console.log(createdPackages);
       res.status(201).json(createdPackages);
     } catch (error) {
       logger.error(error);
