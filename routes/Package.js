@@ -103,4 +103,24 @@ router.get("/benefits/fetchAll", async (req, res) => {
   }
 });
 
+// delete a specific benefit
+router.delete(
+  "/benefits/delete",
+  verification,
+  validateRole(["admin"]),
+  async (req, res) => {
+    try {
+      const data = await PackageBenefits.findOneAndDelete({
+        _id: req.body._id,
+      });
+      res.status(202).json(data);
+    } catch (error) {
+      logger.error(error);
+      res.status(500).json({
+        error: `Failed to delete benefit due to following error: ${error}`,
+      });
+    }
+  },
+);
+
 module.exports = router;
