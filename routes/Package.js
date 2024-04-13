@@ -105,13 +105,13 @@ router.get("/benefits/fetchAll", async (req, res) => {
 
 // delete a specific benefit
 router.delete(
-  "/benefits/delete",
+  "/benefits/delete/:benefitId",
   verification,
   validateRole(["admin"]),
   async (req, res) => {
     try {
       const data = await PackageBenefits.findOneAndDelete({
-        _id: req.body._id,
+        _id: req.params.benefitId,
       });
       res.status(202).json(data);
     } catch (error) {
