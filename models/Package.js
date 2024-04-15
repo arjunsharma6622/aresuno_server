@@ -31,7 +31,7 @@ const PackageSchema = new mongoose.Schema(
     features: {
       type: Array,
       required: true,
-      default: [false, false, false, false, false, false, false, false],
+      default: [],
     },
   },
   {
