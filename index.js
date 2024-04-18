@@ -13,6 +13,7 @@ const multer = require("multer");
 const { verification } = require("./middlewares/authorization");
 const axios = require("axios");
 const logger = require("./utils/logger");
+const morgan = require("morgan");
 
 logger.info("Starting app.");
 dotenv.config();
@@ -57,6 +58,9 @@ app.use(
 );
 
 app.use(cookieParser());
+
+// logging using morgan
+app.use(morgan("dev"));
 
 // Connect to MongoDB database
 mongoose
